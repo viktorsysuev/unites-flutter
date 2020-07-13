@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:unites_flutter/ui/events/EventsListScreen.dart';
+import 'package:unites_flutter/src/ui/events/EventsListScreen.dart';
 
 
 class Home extends StatefulWidget {

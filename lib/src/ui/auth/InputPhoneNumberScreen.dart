@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:unites_flutter/ui/Home.dart';
-import 'package:unites_flutter/ui/events/EventsListScreen.dart';
+import 'package:unites_flutter/src/resources/UserRepository.dart';
+import 'package:unites_flutter/src/ui/auth/RegistrationScreen.dart';
+import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
+
+import '../../Home.dart';
 
 
 
@@ -15,6 +18,8 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
 
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
+
+  final UserRepository userRepository = UserRepository();
 
   String _phone;
   String _errorMessage;
@@ -105,9 +110,16 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
           FirebaseUser user = result.user;
 
           if(user != null){
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) => Home()
-            ));
+            final userExist = await userRepository.isUserExist();
+            if(userExist) {
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => Home()
+              ));
+            } else {
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => RegistrationScreen()
+              ));
+            }
           }else{
             print("Error");
           }
@@ -146,9 +158,16 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                         FirebaseUser user = result.user;
 
                         if(user != null){
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => Home()
-                          ));
+                          final userExist = await userRepository.isUserExist();
+                          if(userExist) {
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => Home()
+                            ));
+                          } else {
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => RegistrationScreen()
+                            ));
+                          }
                         }else{
                           print("Error");
                         }

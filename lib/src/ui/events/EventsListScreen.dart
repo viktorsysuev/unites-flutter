@@ -1,9 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/resources/EventRepository.dart';
 
 
 
 class EventsListScreen extends StatelessWidget{
+
+  EventRepository eventRepository = EventRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,11 @@ class EventsListScreen extends StatelessWidget{
               textColor: Colors.white,
               child: Text('Мероприятия'),
               onPressed: () {
+                final event = EventModel();
+                event.id = "1";
+                event.name = "Тестовое меоприятие";
+                event.description = "Для тестае";
+                eventRepository.addNewEvent(event);
               },
             ),
           ),
