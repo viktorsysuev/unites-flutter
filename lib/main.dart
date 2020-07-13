@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/ui/Home.dart';
 import 'package:unites_flutter/ui/auth/InputPhoneNumberScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
     title: 'Unites',
     home: IntroScreen(),
@@ -9,38 +12,29 @@ void main() {
 }
 
 class IntroScreen extends StatelessWidget {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ListView(children: <Widget>[
-          SizedBox(height: 220.0),
-          Column(
-            children: <Widget>[
-              SizedBox(height: 16.0),
-              Text(
-                'Unites',
-                style: TextStyle(fontSize: 26.0),
-              ),
-            ],
-          ),
-          SizedBox(height: 40.0),
-          Center(
-            child: RaisedButton(
-              color: Colors.lightBlue,
-              textColor: Colors.white,
-              child: Text('Войти'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => InputPhoneNumberScreen()),
-                );
-              },
-            ),
-          ),
-        ]),
-      ),
-    );
+    getUser(context);
+    return Scaffold();
+  }
+
+
+  void getUser(BuildContext context) async {
+    final FirebaseUser user = await _auth.currentUser();
+    if (user != null){
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Home()),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => InputPhoneNumberScreen()),
+      );
+    }
+
   }
 }
