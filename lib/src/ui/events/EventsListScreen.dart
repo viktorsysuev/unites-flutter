@@ -1,12 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/resources/EventRepository.dart';
+import 'package:unites_flutter/src/ui/events/CreateEventScreen.dart';
 
-
-
-class EventsListScreen extends StatelessWidget{
-
+class EventsListScreen extends StatelessWidget {
   EventRepository eventRepository = EventRepository();
 
   @override
@@ -15,38 +12,14 @@ class EventsListScreen extends StatelessWidget{
       appBar: AppBar(
         title: Text('Мероприятия'),
       ),
-      body: Center(
-        child: ListView(children: <Widget>[
-          SizedBox(height: 220.0),
-          Column(
-            children: <Widget>[
-              SizedBox(height: 16.0),
-              Text(
-                'Unites',
-                style: TextStyle(fontSize: 26.0),
-              ),
-            ],
-          ),
-          SizedBox(height: 40.0),
-          Center(
-            child: RaisedButton(
-              color: Colors.lightBlue,
-              textColor: Colors.white,
-              child: Text('Мероприятия'),
-              onPressed: () {
-                final event = EventModel();
-                event.id = "1";
-                event.name = "Тестовое меоприятие";
-                event.description = "Для тестае";
-                eventRepository.addNewEvent(event);
-              },
-            ),
-          ),
-        ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CreateEventScreen()));
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.lightBlue,
       ),
     );
   }
-
-
-
 }

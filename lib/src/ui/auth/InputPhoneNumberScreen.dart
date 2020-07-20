@@ -6,8 +6,6 @@ import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
 
 import '../../Home.dart';
 
-
-
 class InputPhoneNumberScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _InputPhoneNumberScreen();
@@ -31,10 +29,10 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
         body: Stack(
-          children: <Widget>[
-            _showForm(),
-          ],
-        ));
+      children: <Widget>[
+        _showForm(),
+      ],
+    ));
   }
 
   Widget showPhoneInput() {
@@ -70,14 +68,13 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
             color: Colors.blue,
             child: new Text('Отправить',
                 style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-            onPressed: (){
+            onPressed: () {
               final phone = _phoneController.text.trim();
               loginUser(phone, context);
             },
           ),
         ));
   }
-
 
   Widget _showForm() {
     return new Container(
@@ -95,41 +92,38 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
         ));
   }
 
-
-  Future<bool> loginUser(String phone, BuildContext context) async{
+  Future<bool> loginUser(String phone, BuildContext context) async {
     FirebaseAuth _auth = FirebaseAuth.instance;
 
     _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
-        verificationCompleted: (AuthCredential credential) async{
+        verificationCompleted: (AuthCredential credential) async {
           Navigator.of(context).pop();
 
           AuthResult result = await _auth.signInWithCredential(credential);
 
           FirebaseUser user = result.user;
 
-          if(user != null){
+          if (user != null) {
             final userExist = await userRepository.isUserExist();
-            if(userExist) {
-              Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => Home()
-              ));
+            if (userExist) {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Home()));
             } else {
-              Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => RegistrationScreen()
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RegistrationScreen()));
             }
-          }else{
+          } else {
             print("Error");
           }
-
         },
-        verificationFailed: (AuthException exception){
+        verificationFailed: (AuthException exception) {
           print(exception.message);
         },
-
-        codeSent: (String verificationId, [int forceResendingToken]){
+        codeSent: (String verificationId, [int forceResendingToken]) {
           showDialog(
               context: context,
               barrierDismissible: false,
@@ -149,36 +143,40 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                       child: Text("Подтвердить"),
                       textColor: Colors.white,
                       color: Colors.blue,
-                      onPressed: () async{
+                      onPressed: () async {
                         final code = _codeController.text.trim();
-                        AuthCredential credential = PhoneAuthProvider.getCredential(verificationId: verificationId, smsCode: code);
+                        AuthCredential credential =
+                            PhoneAuthProvider.getCredential(
+                                verificationId: verificationId, smsCode: code);
 
-                        AuthResult result = await _auth.signInWithCredential(credential);
+                        AuthResult result =
+                            await _auth.signInWithCredential(credential);
 
                         FirebaseUser user = result.user;
 
-                        if(user != null){
+                        if (user != null) {
                           final userExist = await userRepository.isUserExist();
-                          if(userExist) {
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => Home()
-                            ));
+                          if (userExist) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Home()));
                           } else {
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => RegistrationScreen()
-                            ));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        RegistrationScreen()));
                           }
-                        }else{
+                        } else {
                           print("Error");
                         }
                       },
                     )
                   ],
                 );
-              }
-          );
+              });
         },
-        codeAutoRetrievalTimeout: null
-    );
+        codeAutoRetrievalTimeout: null);
   }
 }

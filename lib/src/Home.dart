@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/ui/events/EventsListScreen.dart';
-
+import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -16,7 +15,7 @@ class _HomeState extends State<Home> {
     EventsListScreen(),
     PlaceholderWidget(Colors.deepOrange),
     PlaceholderWidget(Colors.green),
-    PlaceholderWidget(Colors.deepPurpleAccent)
+    ProfileMainScreen()
   ];
 
   void onTabTapped(int index) {
@@ -24,7 +23,6 @@ class _HomeState extends State<Home> {
       _currentIndex = index;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +32,8 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-        currentIndex: _currentIndex, // this will be set when a new tab is tapped
+        currentIndex:
+            _currentIndex, // this will be set when a new tab is tapped
         onTap: onTabTapped, // new
         items: [
           BottomNavigationBarItem(
@@ -50,15 +49,12 @@ class _HomeState extends State<Home> {
             title: new Text('Уведомления'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              title: Text('Профиль')
-          )
+              icon: Icon(Icons.person), title: Text('Профиль'))
         ],
       ),
     );
   }
 }
-
 
 class PlaceholderWidget extends StatelessWidget {
   final Color color;

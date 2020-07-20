@@ -13,10 +13,9 @@ class IntroScreen extends StatelessWidget {
     return Scaffold();
   }
 
-
   void getUser(BuildContext context) async {
     final FirebaseUser user = await _auth.currentUser();
-    if (user != null){
+    if (user != null) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => Home()),
@@ -24,8 +23,7 @@ class IntroScreen extends StatelessWidget {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => InputPhoneNumberScreen()),
+        MaterialPageRoute(builder: (context) => InputPhoneNumberScreen()),
       );
     }
   }

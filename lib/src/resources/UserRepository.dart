@@ -6,12 +6,9 @@ class UserRepository {
   final db = Firestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
 
-
   Future<bool> isUserExist() async {
     final user = await auth.currentUser();
-    final doc = await db.collection('users')
-        .document(user.uid)
-        .get();
+    final doc = await db.collection('users').document(user.uid).get();
     return doc.exists;
   }
 
@@ -21,11 +18,22 @@ class UserRepository {
     db.collection('users').document(user.id).setData(user.toJson());
   }
 
+  Future<UserModel> getUser(String userId) async {
+    var doc = await db.collection('users').document(userId).get();
+    var user = UserModel.fromJson(doc.data);
+    return user;
+  }
+
   Future<UserModel> updateUser(UserModel user) async {
     db.collection('users').document(user.id).updateData(user.toJson());
   }
 
   Future<FirebaseUser> getCurrentFirebaseUser() async {
     return await auth.currentUser();
+  }
+
+  Future<String> getCurrentUserId() async {
+    var user = await auth.currentUser();
+    return user.uid;
   }
 }

@@ -1,5 +1,3 @@
-
-
 class UserModel {
   String id;
   String firstName;
@@ -10,16 +8,21 @@ class UserModel {
   String token;
   String aboutMe;
 
-
-  UserModel({this.id, this.firstName, this.lastName, this.interests, this.useful, this.company, this.token, this.aboutMe});
+  UserModel(
+      {this.id,
+      this.firstName,
+      this.lastName,
+      this.interests,
+      this.useful,
+      this.company,
+      this.token,
+      this.aboutMe});
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) =>
       _UserModellFromJson(json);
 
   Map<String, dynamic> toJson() => _UserModelToJson(this);
-
 }
-
 
 UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
   return UserModel(
@@ -34,8 +37,7 @@ UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _UserModelToJson(UserModel instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
       'id': instance.id,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
