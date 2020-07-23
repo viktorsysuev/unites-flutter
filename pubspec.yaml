@@ -32,8 +32,8 @@ dependencies:
   google_maps_flutter: ^0.5.28
   google_map_location_picker: ^3.3.3
   geolocator: ^5.3.1
-
   json_serializable: ^3.3.0
+  intl: ^0.16.1
 
   # Add the following three lines
 

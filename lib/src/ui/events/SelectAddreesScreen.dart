@@ -22,6 +22,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   static const LatLng _center = const LatLng(45.521563, -122.677433);
 
   final Map<String, Marker> _markers = {};
+  final Map<LatLng, String> address = {};
   String _selectAddress;
 
   _getAddress() async {
@@ -42,7 +43,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
 
           infoWindow: InfoWindow(
             onTap: () {
-              Navigator.pop(context, _selectAddress);
+              Navigator.pop(context, "$_selectAddress $latitude $longitude");
             },
             title: _selectAddress,
             snippet: _selectAddress,
@@ -80,11 +81,8 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
       setState(() {
-        // Store the position in the variable
         _currentPosition = position;
 
-        print('CURRENT POS: $_currentPosition');
-        // For moving the camera to current location
         mapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(

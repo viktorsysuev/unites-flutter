@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:unites_flutter/src/ui/events/EventsListScreen.dart';
+import 'package:unites_flutter/src/ui/events/MainEventsScreen.dart';
 import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    EventsListScreen(),
+    MainEventsScreen(),
     PlaceholderWidget(Colors.deepOrange),
     PlaceholderWidget(Colors.green),
     ProfileMainScreen()

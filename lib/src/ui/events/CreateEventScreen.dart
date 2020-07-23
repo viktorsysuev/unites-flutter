@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -39,14 +41,23 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TimeOfDay startTime = TimeOfDay.now();
   DateTime endDate = DateTime.now();
   TimeOfDay endTime = TimeOfDay.now();
+  GeoPoint coordinates;
 
   _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SelectAddressScreen()),
     );
+    var arrString = result.toString().split(" ");
+    var res = "";
 
-    addressController.text = result;
+    coordinates = GeoPoint(double.parse(arrString[arrString.length - 2]), double.parse(arrString[arrString.length - 1]));
+    arrString.forEach((element) {
+      if(element != arrString[arrString.length - 2] && element != arrString[arrString.length - 1]){
+        res += '$element ';
+      }
+    });
+    addressController.text = res;
   }
 
   TextStyle linkStyle = TextStyle(color: Colors.blue);
@@ -191,11 +202,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             child: TextFormField(
               onTap: () async {
                 _navigateAndDisplaySelection(context);
-//                await Navigator.push(
-//                  context,
-//                  MaterialPageRoute(
-//                      builder: (context) => SelectAddressScreen()),
-//                );
               },
               controller: addressController,
               decoration: InputDecoration(
@@ -302,6 +308,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       event.address = addressController.text;
                       event.start = startDate;
                       event.end = endDate;
+                      event.coordinates = coordinates;
                       eventBloc.createEvent(event);
                       Navigator.push(
                         context,

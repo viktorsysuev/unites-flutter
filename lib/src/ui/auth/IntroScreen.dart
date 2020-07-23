@@ -5,7 +5,7 @@ import 'package:unites_flutter/src/ui/auth/InputPhoneNumberScreen.dart';
 import '../../Home.dart';
 
 class IntroScreen extends StatelessWidget {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +14,14 @@ class IntroScreen extends StatelessWidget {
   }
 
   void getUser(BuildContext context) async {
-    final FirebaseUser user = await _auth.currentUser();
+    final user = await _auth.currentUser();
     if (user != null) {
-      Navigator.push(
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Home()),
       );
     } else {
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => InputPhoneNumberScreen()),
       );
