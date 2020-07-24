@@ -281,6 +281,9 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 6.6)
     - PromisesObjC (~> 1.2)
   - Flutter (1.0.0)
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
   - "geolocator (5.3.2+2)":
     - Flutter
   - google_map_location_picker (2.1.1):
@@ -357,7 +360,12 @@ PODS:
   - nanopb/encode (1.30905.0)
   - package_info (0.0.1):
     - Flutter
+  - path_provider (0.0.1):
+    - Flutter
   - PromisesObjC (1.2.9)
+  - sqflite (0.0.1):
+    - Flutter
+    - FMDB (~> 2.7.2)
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -369,6 +377,8 @@ DEPENDENCIES:
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
   - location_permissions (from `.symlinks/plugins/location_permissions/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/ios`)
 
 SPEC REPOS:
   trunk:
@@ -381,6 +391,7 @@ SPEC REPOS:
     - FirebaseCoreDiagnostics
     - FirebaseFirestore
     - FirebaseInstallations
+    - FMDB
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -412,6 +423,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/location_permissions/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -427,6 +442,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 4291ab811ad323a2b807a4a481cd5df2e445a676
   FirebaseInstallations: 293f567159b6d66d1c990f13bb868066096c94ec
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   geolocator: f7622e0e7e2a24718285b73916d60c4a54b9f5b6
   google_map_location_picker: 01403f2fb025f6aedf0b36b5f15eccc9415a55f1
   google_maps_flutter: df4e7de95264aa0a2f11aac0fc7e313acb8ffc7e
@@ -442,7 +458,9 @@ SPEC CHECKSUMS:
   location_permissions: 7e0f9aa0f60deb8ff93ddf0e2a164c7e8197bc94
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: b48e0338dbbac2207e611750777895f7a5811b75
+  sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 

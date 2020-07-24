@@ -18,7 +18,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
   @override
   void initState() {
     super.initState();
-    eventBloc.fetchAllEvents();
+    eventBloc.addListener();
+    eventBloc.getEvents();
   }
 
   @override
@@ -43,7 +44,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
           child: StreamBuilder<List<EventModel>>(
-            stream: eventBloc.getAllEvents,
+            stream: eventBloc.events,
             builder: (BuildContext context,
                 AsyncSnapshot<List<EventModel>> snapshot) {
               Widget child;

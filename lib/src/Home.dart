@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/ui/events/MainEventsScreen.dart';
 import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
@@ -22,6 +23,11 @@ class _HomeState extends State<Home> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override

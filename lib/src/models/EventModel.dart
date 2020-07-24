@@ -32,6 +32,24 @@ class EventModel {
 
   Map<String, dynamic> toJson() => _EventModelToJson(this);
 
+  Map<String, dynamic> toMap() => _EventModelToMap(this);
+
+  factory EventModel.fromDB(Map<String, dynamic> table) {
+    return EventModel(
+        id: table['eventId'],
+        name: table['name'],
+        description: table['description'],
+        company: table['company'],
+        phoneNumber: table['phoneNumber'],
+        email: table['email'],
+        address: table['address'],
+        coordinates: table['coordinates'] != null ? GeoPoint(
+            double.parse(table['coordinates'].toString().split(' ')[0]),
+            double.parse(table['coordinates'].toString().split(' ')[1])) : null,
+        start: DateTime.parse(table['start']),
+        end: DateTime.parse(table['end']));
+  }
+
   @override
   String toString() => "Event <$name>";
 }
@@ -63,4 +81,19 @@ Map<String, dynamic> _EventModelToJson(EventModel instance) =>
       'coordinates': instance.coordinates,
       'start': instance.start,
       'end': instance.end,
+    };
+
+Map<String, dynamic> _EventModelToMap(EventModel instance) => <String, dynamic>{
+      'eventId': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+      'company': instance.company,
+      'phoneNumber': instance.phoneNumber,
+      'email': instance.email,
+      'address': instance.address,
+      'coordinates': instance.coordinates != null
+          ? '${instance.coordinates.latitude} ${instance.coordinates.longitude}'
+          : null,
+      'start': instance.start.toIso8601String(),
+      'end': instance.end.toIso8601String(),
     };

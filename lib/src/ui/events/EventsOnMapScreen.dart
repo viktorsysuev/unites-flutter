@@ -20,7 +20,7 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    eventBloc.fetchAllEvents();
+    eventBloc.getEvents();
   }
 
   @override
@@ -71,13 +71,13 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<List<EventModel>>(
-        stream: eventBloc.getAllEvents,
+        stream: eventBloc.events,
         builder:
             (BuildContext context, AsyncSnapshot<List<EventModel>> snapshot) {
           Widget child;
           if (snapshot.hasData) {
             snapshot.data.forEach((element) {
-              if (element.coordinates != null) {
+              if (element.coordinates != null && element.id != null) {
                 final marker = Marker(
                   markerId: MarkerId(element.id),
                   position: LatLng(element.coordinates.latitude,
