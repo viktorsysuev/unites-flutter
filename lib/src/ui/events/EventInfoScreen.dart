@@ -1,7 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/EventWithParticipants.dart';
+import 'package:unites_flutter/src/ui/events/ParticipantsListScreen.dart';
 import 'package:unites_flutter/src/ui/widgets/LittleWidgetsCollection.dart';
 
 class EventInfoScreen extends StatefulWidget {
@@ -20,7 +23,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
   @override
   void initState() {
     super.initState();
-    eventBloc.fetchEvent(widget.eventId);
+    eventBloc.getEventWithParticipants(widget.eventId);
   }
 
   @override
@@ -39,27 +42,27 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
           padding: EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
-          child: StreamBuilder<EventModel>(
-            stream: eventBloc.getEvent,
-            builder:
-                (BuildContext context, AsyncSnapshot<EventModel> snapshot) {
+          child: StreamBuilder<EventWithParticipants>(
+            stream: eventBloc.eventWithParticipants,
+            builder: (BuildContext context,
+                AsyncSnapshot<EventWithParticipants> snapshot) {
               Widget child;
               if (snapshot.hasData) {
                 child = SingleChildScrollView(
                   child: Column(children: <Widget>[
                     Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
                     Center(
-                      child: Text('${snapshot.data.name}',
+                      child: Text('${snapshot.data.eventModel.name}',
                           style: TextStyle(fontSize: 22.0)),
                     ),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Center(
-                      child: Text('${snapshot.data.description}',
+                      child: Text('${snapshot.data.eventModel.description}',
                           style: TextStyle(fontSize: 16.0)),
                     ),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Center(
-                      child: Text('${snapshot.data.company}',
+                      child: Text('${snapshot.data.eventModel.company}',
                           style: TextStyle(fontSize: 16.0)),
                     ),
                     Padding(
@@ -73,7 +76,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
-                            Text('${snapshot.data.address}',
+                            Text('${snapshot.data.eventModel.address}',
                                 style: TextStyle(fontSize: 16.0)),
                             Container(margin: EdgeInsets.only(top: 16.0)),
                             Text('Начало:',
@@ -81,7 +84,8 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
-                            Text('${formatter.format(snapshot.data.start)}',
+                            Text(
+                                '${formatter.format(snapshot.data.eventModel.start)}',
                                 style: TextStyle(fontSize: 16.0)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
                             Text('Конец:',
@@ -89,8 +93,26 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
-                            Text('${formatter.format(snapshot.data.end)}',
+                            Text(
+                                '${formatter.format(snapshot.data.eventModel.end)}',
                                 style: TextStyle(fontSize: 16.0)),
+                            Container(margin: EdgeInsets.only(top: 16.0)),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(decoration: TextDecoration.underline),
+                                  text:
+                                      'Участников ${snapshot.data.participants.length}',
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ParticipantsListScreen(
+                                                      eventId: snapshot.data
+                                                          .eventModel.id)));
+                                    }),
+                            ),
                           ]),
                     ),
                     Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
@@ -98,7 +120,9 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                       child: RaisedButton(
                         color: Colors.lightBlue,
                         child: Text('Вступить'),
-                        onPressed: () {},
+                        onPressed: () {
+                          eventBloc.joinEvent(widget.eventId);
+                        },
                       ),
                     ),
                   ]),

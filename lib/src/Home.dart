@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
+import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/ui/events/MainEventsScreen.dart';
 import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
@@ -27,6 +28,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    UsersBloc().initUsers();
     super.initState();
   }
 

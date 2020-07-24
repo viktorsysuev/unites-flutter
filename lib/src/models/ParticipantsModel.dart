@@ -1,10 +1,10 @@
 class ParticipantsModel {
-  String id;
+  String docId;
   String eventId;
   String userId;
   String role;
 
-  ParticipantsModel({this.id, this.eventId, this.userId, this.role});
+  ParticipantsModel({this.docId, this.eventId, this.userId, this.role});
 
   factory ParticipantsModel.fromJson(Map<dynamic, dynamic> json) =>
       _ParticipantsModelFromJson(json);
@@ -12,12 +12,12 @@ class ParticipantsModel {
   Map<String, dynamic> toJson() => _ParticipantsModelToJson(this);
 
   @override
-  String toString() => "Event <$id>";
+  String toString() => "Event <$docId>";
 }
 
 ParticipantsModel _ParticipantsModelFromJson(Map<dynamic, dynamic> json) {
   return ParticipantsModel(
-    id: json['id'] as String,
+    docId: json['docId'] as String,
     eventId: json['eventId'] as String,
     userId: json['userId'] as String,
     role: json['role'] as String,
@@ -26,7 +26,7 @@ ParticipantsModel _ParticipantsModelFromJson(Map<dynamic, dynamic> json) {
 
 Map<String, dynamic> _ParticipantsModelToJson(ParticipantsModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'docId': instance.docId,
       'eventId': instance.eventId,
       'userId': instance.userId,
       'role': instance.role,

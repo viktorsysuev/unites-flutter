@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/EventWithParticipants.dart';
+import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/EventRepository.dart';
 
 class EventsBloc {
@@ -13,7 +15,17 @@ class EventsBloc {
 
   final _eventsController = StreamController<List<EventModel>>.broadcast();
 
+  final _participantsController = StreamController<List<UserModel>>.broadcast();
+
+  final _eventWithParticipantsController =
+      StreamController<EventWithParticipants>.broadcast();
+
   Stream<List<EventModel>> get events => _eventsController.stream;
+
+  Stream<List<UserModel>> get participants => _participantsController.stream;
+
+  Stream<EventWithParticipants> get eventWithParticipants =>
+      _eventWithParticipantsController.stream;
 
   Stream<EventModel> get getEvent => _eventFetcher.stream;
 
@@ -23,6 +35,8 @@ class EventsBloc {
 
   EventsBloc() {
     events;
+    eventWithParticipants;
+    participants;
 
     _addEventsController.stream.listen(_handleAddEvent);
   }
@@ -30,6 +44,15 @@ class EventsBloc {
   void getEvents() async {
     var events = await _eventRepository.getAllEvents();
     _eventsController.sink.add(events);
+  }
+
+  void getEventWithParticipants(String eventId) async {
+    var event = await _eventRepository.getEvent(eventId);
+    var participants = await _eventRepository.getEventParticipants(eventId);
+    var res = EventWithParticipants();
+    res.eventModel = event;
+    res.participants = participants;
+    _eventWithParticipantsController.sink.add(res);
   }
 
   void addListener() async {
@@ -45,10 +68,29 @@ class EventsBloc {
     });
   }
 
+  getEventParticipants(String eventId) async {
+    var participants =
+        await _eventRepository.getEventParticipantsFomDB(eventId);
+    _participantsController.sink.add(participants);
+  }
+
   createEvent(EventModel eventModel) {
     inAddEvent.add(eventModel);
     _eventRepository.addNewEvent(eventModel);
   }
+
+  joinEvent(String eventId) {
+    _eventRepository.joinEvent(eventId);
+  }
+
+  leftEvent(String eventId) {
+    _eventRepository.leftEvent(eventId);
+  }
+
+//  bool isMember(String eventId) {
+//    var firestoreDB = Firestore.instance;
+//    firestoreDB.collection('events')
+//  }
 
   initEvetns() async {
     var events = await _eventRepository.initEvents();
@@ -64,6 +106,7 @@ class EventsBloc {
   dispose() {
     _addEventsController.close();
     _eventsController.close();
+    _eventWithParticipantsController.close();
   }
 
   void _handleAddEvent(EventModel event) async {

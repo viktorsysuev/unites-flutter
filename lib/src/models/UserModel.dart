@@ -1,5 +1,5 @@
 class UserModel {
-  String id;
+  String userId;
   String firstName;
   String lastName;
   String interests;
@@ -9,7 +9,7 @@ class UserModel {
   String aboutMe;
 
   UserModel(
-      {this.id,
+      {this.userId,
       this.firstName,
       this.lastName,
       this.interests,
@@ -26,7 +26,7 @@ class UserModel {
 
 UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
   return UserModel(
-    id: json['id'] as String,
+    userId: json['userId'] as String,
     firstName: json['firstName'] as String,
     lastName: json['lastName'] as String,
     interests: json['interests'] as String,
@@ -38,7 +38,7 @@ UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
 }
 
 Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
-      'id': instance.id,
+      'userId': instance.userId,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'interests': instance.interests,

@@ -14,8 +14,8 @@ class UserRepository {
 
   Future<UserModel> createNewUser(UserModel user) async {
     var currentUser = await auth.currentUser();
-    user.id = currentUser.uid;
-    db.collection('users').document(user.id).setData(user.toJson());
+    user.userId = currentUser.uid;
+    db.collection('users').document(user.userId).setData(user.toJson());
   }
 
   Future<UserModel> getUser(String userId) async {
@@ -25,7 +25,7 @@ class UserRepository {
   }
 
   Future<UserModel> updateUser(UserModel user) async {
-    db.collection('users').document(user.id).updateData(user.toJson());
+    db.collection('users').document(user.userId).updateData(user.toJson());
   }
 
   Future<FirebaseUser> getCurrentFirebaseUser() async {

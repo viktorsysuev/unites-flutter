@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:unites_flutter/src/database/CreateTable.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/ParticipantsModel.dart';
+import 'package:unites_flutter/src/models/UserModel.dart';
 
 class DatabaseProvider {
   DatabaseProvider._();
@@ -25,20 +28,7 @@ class DatabaseProvider {
     var path = join(documentsDirectory.path, 'UnitesDatabase.db');
     return await openDatabase(path, version: 4, onOpen: (db) {},
         onCreate: (Database db, int version) async {
-      await db.execute("CREATE TABLE events ("
-          "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-          "eventId TEXT,"
-          "name TEXT,"
-          "description TEXT,"
-          "company TEXT,"
-          "phoneNumber TEXT,"
-          "email TEXT,"
-          "address TEXT,"
-          "coordinates TEXT,"
-          "start start,"
-          "end TEXT,"
-          "UNIQUE(eventId)"
-          ")");
+      await createTables.forEach((name, text) async => await db.execute(text));
     });
   }
 
@@ -52,9 +42,20 @@ class DatabaseProvider {
     return events;
   }
 
+  Future<List<UserModel>> getEventParticipants(String eventId) async {
+    final db = await database;
+    var res = await db.query("users WHERE userId in (SELECT userId FROM participants WHERE eventId = '$eventId')");
+    var participants = List<UserModel>();
+    res.forEach((element) {
+      participants.add(UserModel.fromJson(element));
+    });
+    return participants;
+  }
+
   Future<EventModel> getEvent(String eventId) async {
     final db = await database;
-    var res = await db.query('events', where: 'eventId = ?', whereArgs: [eventId]);
+    var res =
+        await db.query('events', where: 'eventId = ?', whereArgs: [eventId]);
     return EventModel.fromDB(res[0]);
   }
 
