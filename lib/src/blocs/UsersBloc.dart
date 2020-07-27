@@ -25,6 +25,11 @@ class UsersBloc {
     _userFetcher.sink.add(user);
   }
 
+  getUserById(String userId) async {
+    var user = await _userRepository.getUser(userId);
+    _userFetcher.sink.add(user);
+  }
+
   dispose() {
     _userFetcher.close();
   }

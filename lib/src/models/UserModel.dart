@@ -4,6 +4,7 @@ class UserModel {
   String lastName;
   String interests;
   String useful;
+  String phone;
   String company;
   String token;
   String aboutMe;
@@ -14,6 +15,7 @@ class UserModel {
       this.lastName,
       this.interests,
       this.useful,
+      this.phone,
       this.company,
       this.token,
       this.aboutMe});
@@ -31,6 +33,7 @@ UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
     lastName: json['lastName'] as String,
     interests: json['interests'] as String,
     useful: json['useful'] as String,
+    phone: json['phone'] as String,
     company: json['company'] as String,
     token: json['token'] as String,
     aboutMe: json['aboutMe'] as String,
@@ -43,6 +46,7 @@ Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
       'lastName': instance.lastName,
       'interests': instance.interests,
       'useful': instance.useful,
+      'phone': instance.phone,
       'company': instance.company,
       'token': instance.token,
       'aboutMe': instance.aboutMe,

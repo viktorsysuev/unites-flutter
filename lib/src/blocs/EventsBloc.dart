@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
+import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/EventRepository.dart';
 
@@ -24,8 +25,7 @@ class EventsBloc {
 
   Stream<List<UserModel>> get participants => _participantsController.stream;
 
-  Stream<EventWithParticipants> get eventWithParticipants =>
-      _eventWithParticipantsController.stream;
+  Stream<EventWithParticipants> get eventWithParticipants => _eventWithParticipantsController.stream;
 
   Stream<EventModel> get getEvent => _eventFetcher.stream;
 
@@ -55,7 +55,7 @@ class EventsBloc {
     _eventWithParticipantsController.sink.add(res);
   }
 
-  void addListener() async {
+  void addEventsListener() async {
     var firestoreDB = Firestore.instance;
     firestoreDB.collection('events').snapshots().listen((event) {
       event.documentChanges.forEach((element) {
@@ -68,9 +68,28 @@ class EventsBloc {
     });
   }
 
+  void addParticipantsListener() async {
+    var firestoreDB = Firestore.instance;
+    firestoreDB
+        .collectionGroup('participants')
+        .snapshots()
+        .listen((participant) {
+      participant.documentChanges.forEach((element) async {
+        if (element.type == DocumentChangeType.modified) {
+          var participant = ParticipantsModel.fromJson(element.document.data);
+          DatabaseProvider.db.insertData('participants', participant.toJson());
+          getEventWithParticipants(participant.eventId);
+        } else if (element.type == DocumentChangeType.removed) {
+          var participant = ParticipantsModel.fromJson(element.document.data);
+          DatabaseProvider.db.deleteParticipant(participant.eventId, participant.userId);
+          getEventWithParticipants(participant.eventId);
+        }
+      });
+    });
+  }
+
   getEventParticipants(String eventId) async {
-    var participants =
-        await _eventRepository.getEventParticipantsFomDB(eventId);
+    var participants = await _eventRepository.getEventParticipantsFomDB(eventId);
     _participantsController.sink.add(participants);
   }
 
@@ -79,12 +98,12 @@ class EventsBloc {
     _eventRepository.addNewEvent(eventModel);
   }
 
-  joinEvent(String eventId) {
-    _eventRepository.joinEvent(eventId);
+  joinEvent(String eventId) async {
+    await _eventRepository.joinEvent(eventId);
   }
 
-  leftEvent(String eventId) {
-    _eventRepository.leftEvent(eventId);
+  leftEvent(String eventId) async {
+    await _eventRepository.leftEvent(eventId);
   }
 
 //  bool isMember(String eventId) {
@@ -101,6 +120,10 @@ class EventsBloc {
     _eventRepository
         .getEvent(eventId)
         .then((value) => _eventFetcher.sink.add(value));
+  }
+
+  Future<bool> isMember(String eventId) async {
+    return await _eventRepository.isParticipant(eventId);
   }
 
   dispose() {

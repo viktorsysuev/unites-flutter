@@ -29,6 +29,7 @@ Map<String, String> createTables = {
 	      lastName TEXT,
 	      interests TEXT,
 	      useful TEXT,
+	      phone TEXT,
 	      company TEXT,
 	      token TEXT,
 	      aboutMe TEXT,

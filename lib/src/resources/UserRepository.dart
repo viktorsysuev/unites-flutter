@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unites_flutter/src/database/DatabaseProvider.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 
 class UserRepository {
@@ -15,12 +16,12 @@ class UserRepository {
   Future<UserModel> createNewUser(UserModel user) async {
     var currentUser = await auth.currentUser();
     user.userId = currentUser.uid;
+    user.phone = currentUser.phoneNumber;
     db.collection('users').document(user.userId).setData(user.toJson());
   }
 
   Future<UserModel> getUser(String userId) async {
-    var doc = await db.collection('users').document(userId).get();
-    var user = UserModel.fromJson(doc.data);
+    var user = await DatabaseProvider.db.getUser(userId);
     return user;
   }
 

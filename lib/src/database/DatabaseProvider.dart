@@ -44,7 +44,8 @@ class DatabaseProvider {
 
   Future<List<UserModel>> getEventParticipants(String eventId) async {
     final db = await database;
-    var res = await db.query("users WHERE userId in (SELECT userId FROM participants WHERE eventId = '$eventId')");
+    var res = await db.query(
+        "users WHERE userId in (SELECT userId FROM participants WHERE eventId = '$eventId')");
     var participants = List<UserModel>();
     res.forEach((element) {
       participants.add(UserModel.fromJson(element));
@@ -52,11 +53,37 @@ class DatabaseProvider {
     return participants;
   }
 
+  Future<int> idParticipant(String eventId, String userId) async {
+    final db = await database;
+    var res = await db.rawQuery(
+        "SELECT COUNT(*) FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
+    return Sqflite.firstIntValue(res);
+  }
+
+  Future<ParticipantsModel> getParticipant(
+      String eventId, String userId) async {
+    final db = await database;
+    var res = await db.rawQuery(
+        "SELECT * FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
+    return ParticipantsModel.fromJson(res.first);
+  }
+
+  void deleteParticipant(String eventId, String userId) async {
+    final db = await database;
+    await db.rawQuery("DELETE FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
+  }
+
   Future<EventModel> getEvent(String eventId) async {
     final db = await database;
     var res =
         await db.query('events', where: 'eventId = ?', whereArgs: [eventId]);
     return EventModel.fromDB(res[0]);
+  }
+
+  Future<UserModel> getUser(String userId) async {
+    final db = await database;
+    var res = await db.rawQuery("SELECT * FROM users WHERE userId = '$userId'");
+    return UserModel.fromJson(res.first);
   }
 
   Future<int> insertData(String nameTable, Map<String, dynamic> data) async {

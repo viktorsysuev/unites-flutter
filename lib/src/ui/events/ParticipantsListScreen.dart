@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/App.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
+import 'package:unites_flutter/src/ui/profile/UserInfoScreen.dart';
 import 'package:unites_flutter/src/ui/widgets/LittleWidgetsCollection.dart';
 
 class ParticipantsListScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
                   bufferWidgets.add(Card(
                       child: ListTile(
                         onTap: (){
-//                          Navigator.push(context, MaterialPageRoute(builder: (context) => EventInfoScreen(eventId: element.userId)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => UserInfoScreen(userId: element.userId)));
                         },
                         title: Text('${element.firstName} ${element.lastName} '),
                         subtitle: Text('${element.company}'),

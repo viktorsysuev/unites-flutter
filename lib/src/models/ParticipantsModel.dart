@@ -12,7 +12,7 @@ class ParticipantsModel {
   Map<String, dynamic> toJson() => _ParticipantsModelToJson(this);
 
   @override
-  String toString() => "Event <$docId>";
+  String toString() => "Participant <$docId>";
 }
 
 ParticipantsModel _ParticipantsModelFromJson(Map<dynamic, dynamic> json) {

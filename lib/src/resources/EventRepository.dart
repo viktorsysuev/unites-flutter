@@ -63,17 +63,16 @@ class EventRepository {
 
   joinEvent(String eventId) async {
     var userId = await userRepository.getCurrentUserId();
-    var participant =
-        ParticipantsModel(userId: userId, eventId: eventId, role: 'member');
+    var participant = ParticipantsModel(userId: userId, eventId: eventId, role: 'member');
     await db
         .collection('events')
         .document(eventId)
         .collection('participants')
         .add(participant.toJson())
         .then((value) => {
+          print('update participant ${value.documentID}'),
               participant.docId = value.documentID,
-              DatabaseProvider.db
-                  .insertData('participants', participant.toJson()),
+              DatabaseProvider.db.insertData('participants', participant.toJson()),
               db
                   .collection('events')
                   .document(eventId)
@@ -85,25 +84,15 @@ class EventRepository {
 
   leftEvent(String eventId) async {
     var userId = await userRepository.getCurrentUserId();
-    var participant =
-        ParticipantsModel(userId: userId, eventId: eventId, role: 'member');
-
+    var participant = await DatabaseProvider.db.getParticipant(eventId, userId);
+    await DatabaseProvider.db.deleteParticipant(eventId, userId);
+    print("delete ${participant.docId}");
     await db
         .collection('events')
         .document(eventId)
         .collection('participants')
-        .add(participant.toJson())
-        .then((value) => {
-              participant.docId = value.documentID,
-              DatabaseProvider.db
-                  .insertData('participants', participant.toJson()),
-              db
-                  .collection('events')
-                  .document(eventId)
-                  .collection('participants')
-                  .document(value.documentID)
-                  .updateData(participant.toJson())
-            });
+        .document(participant.docId)
+        .delete();
   }
 
   Future<EventModel> updateEvent(EventModel event) async {
@@ -138,5 +127,11 @@ class EventRepository {
               participants.add(ParticipantsModel.fromJson(element.data));
             }));
     return participants;
+  }
+
+  Future<bool> isParticipant(String eventId) async {
+    var userId = await userRepository.getCurrentUserId();
+    var count = await DatabaseProvider.db.idParticipant(eventId, userId);
+    return count > 0;
   }
 }

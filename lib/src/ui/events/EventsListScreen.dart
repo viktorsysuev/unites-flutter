@@ -18,7 +18,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
   @override
   void initState() {
     super.initState();
-    eventBloc.addListener();
+    eventBloc.addEventsListener();
     eventBloc.getEvents();
   }
 

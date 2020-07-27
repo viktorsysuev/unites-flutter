@@ -3,21 +3,23 @@ import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
 
-class ProfileMainScreen extends StatefulWidget {
+class UserInfoScreen extends StatefulWidget {
+  String userId;
+
+  UserInfoScreen({@required this.userId});
+
   @override
-  State<StatefulWidget> createState() {
-    return ProfileMainScreenState();
-  }
+  _UserInfoScreenState createState() => _UserInfoScreenState();
 }
 
-class ProfileMainScreenState extends State<ProfileMainScreen> {
+class _UserInfoScreenState extends State<UserInfoScreen> {
   final userRepository = UserRepository();
   final userBloc = UsersBloc();
 
   @override
   void initState() {
     super.initState();
-    userBloc.fetchCurrentUser();
+    userBloc.getUserById(widget.userId);
   }
 
   @override
@@ -30,7 +32,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Профиль'),
+        title: Text('Пользователь'),
       ),
       body: StreamBuilder(
         stream: userBloc.getUser,
@@ -83,13 +85,17 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
                   TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
               Container(margin: EdgeInsets.only(top: 8.0)),
               Text('${snapshot.data.useful}', style: TextStyle(fontSize: 16.0)),
+              Container(margin: EdgeInsets.only(top: 16.0)),
+              Text('Контакты: ${snapshot.data.phone}',
+                  style:
+                  TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             ]),
           ),
           Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
           Center(
             child: RaisedButton(
               color: Colors.lightBlue,
-              child: Text('Выйти'),
+              child: Text('Обмен контактами'),
               onPressed: () {},
             ),
           ),

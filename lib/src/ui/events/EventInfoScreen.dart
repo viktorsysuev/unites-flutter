@@ -19,11 +19,19 @@ class EventInfoScreen extends StatefulWidget {
 class _EventInfoScreenState extends State<EventInfoScreen> {
   final eventBloc = EventsBloc();
   final formatter = DateFormat('yyyy-MM-dd hh:mm');
+  var buttonText = '';
 
   @override
   void initState() {
-    super.initState();
+    eventBloc.addParticipantsListener();
+    eventBloc.isMember(widget.eventId).then((isParticipant) => {
+          if (isParticipant)
+            {buttonText = 'Покинуть мероприятие'}
+          else
+            {buttonText = 'Вступить'}
+        });
     eventBloc.getEventWithParticipants(widget.eventId);
+    super.initState();
   }
 
   @override
@@ -47,6 +55,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
             builder: (BuildContext context,
                 AsyncSnapshot<EventWithParticipants> snapshot) {
               Widget child;
+
               if (snapshot.hasData) {
                 child = SingleChildScrollView(
                   child: Column(children: <Widget>[
@@ -99,7 +108,8 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                             Container(margin: EdgeInsets.only(top: 16.0)),
                             RichText(
                               text: TextSpan(
-                                style: TextStyle(decoration: TextDecoration.underline),
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline),
                                   text:
                                       'Участников ${snapshot.data.participants.length}',
                                   recognizer: TapGestureRecognizer()
@@ -119,9 +129,31 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                     Center(
                       child: RaisedButton(
                         color: Colors.lightBlue,
-                        child: Text('Вступить'),
+                        child: Text('$buttonText'),
                         onPressed: () {
-                          eventBloc.joinEvent(widget.eventId);
+                          eventBloc
+                              .isMember(widget.eventId)
+                              .then((isParticipant) => {
+                                    if (isParticipant)
+                                      {
+                                        print("left"),
+                                        eventBloc.leftEvent(widget.eventId),
+                                        eventBloc.getEventWithParticipants(widget.eventId),
+                                      }
+                                    else
+                                      {
+                                        print("join"),
+                                        eventBloc.joinEvent(widget.eventId),
+                                        eventBloc.getEventWithParticipants(widget.eventId),
+                                      }
+                                  });
+                          setState(() {
+                            if(buttonText == 'Вступить'){
+                              buttonText = 'Покинуть мероприятие';
+                            } else {
+                              buttonText = 'Вступить';
+                            }
+                          });
                         },
                       ),
                     ),
