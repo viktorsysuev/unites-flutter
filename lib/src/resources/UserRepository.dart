@@ -20,13 +20,19 @@ class UserRepository {
     db.collection('users').document(user.userId).setData(user.toJson());
   }
 
+  Future<UserModel> updateUser(UserModel user) async {
+    var userId = await getCurrentUserId();
+    user.userId = userId;
+    await DatabaseProvider.db.insertData('users', user.toJson());
+    await db
+        .collection('users')
+        .document(userId)
+        .updateData(user.toJson());
+  }
+
   Future<UserModel> getUser(String userId) async {
     var user = await DatabaseProvider.db.getUser(userId);
     return user;
-  }
-
-  Future<UserModel> updateUser(UserModel user) async {
-    db.collection('users').document(user.userId).updateData(user.toJson());
   }
 
   Future<FirebaseUser> getCurrentFirebaseUser() async {

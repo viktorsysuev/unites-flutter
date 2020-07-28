@@ -8,6 +8,7 @@ class UserModel {
   String company;
   String token;
   String aboutMe;
+  String avatar;
 
   UserModel(
       {this.userId,
@@ -18,7 +19,9 @@ class UserModel {
       this.phone,
       this.company,
       this.token,
-      this.aboutMe});
+      this.aboutMe,
+      this.avatar
+      });
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) =>
       _UserModellFromJson(json);
@@ -37,6 +40,7 @@ UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
     company: json['company'] as String,
     token: json['token'] as String,
     aboutMe: json['aboutMe'] as String,
+    avatar: json['avatar'] as String,
   );
 }
 
@@ -50,4 +54,5 @@ Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
       'company': instance.company,
       'token': instance.token,
       'aboutMe': instance.aboutMe,
+      'avatar': instance.avatar,
     };

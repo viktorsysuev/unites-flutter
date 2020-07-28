@@ -33,6 +33,7 @@ Map<String, String> createTables = {
 	      company TEXT,
 	      token TEXT,
 	      aboutMe TEXT,
+	      avatar TEXT,
 	      UNIQUE(userId)
 	      );""",
 };
