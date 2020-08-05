@@ -86,6 +86,16 @@ class DatabaseProvider {
     return UserModel.fromJson(res.first);
   }
 
+  Future<List<UserModel>> getContacts(String userId) async {
+    final db = await database;
+    var contacts = <UserModel>{};
+    var res = await db.rawQuery("SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
+    res.forEach((element) {
+      contacts.add(UserModel.fromJson(element));
+    });
+    return contacts.toList();
+  }
+
   Future<int> insertData(String nameTable, Map<String, dynamic> data) async {
     var dbClient = await database;
     var id = await dbClient.insert(

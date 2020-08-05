@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
+import 'package:unites_flutter/src/ui/chats/PrivateChatScreen.dart';
 
 import 'EditProfileScreen.dart';
 
@@ -109,7 +110,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               Container(margin: EdgeInsets.only(top: 8.0)),
               Text('${snapshot.data.useful}', style: TextStyle(fontSize: 16.0)),
               Container(margin: EdgeInsets.only(top: 16.0)),
-              Text('Контакты: ${snapshot.data.phone}',
+              Text('Телефон: ${snapshot.data.phone}',
                   style:
                       TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             ]),
@@ -118,8 +119,14 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
           Center(
             child: RaisedButton(
               color: Colors.lightBlue,
-              child: Text('Обмен контактами'),
-              onPressed: () {},
+              child: Text('Написать сообщение'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            PrivateChatScreen(userId: snapshot.data.userId)));
+              },
             ),
           ),
         ]),

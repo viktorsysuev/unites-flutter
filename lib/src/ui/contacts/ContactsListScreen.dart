@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:unites_flutter/src/App.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
+import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
 import 'package:unites_flutter/src/ui/profile/UserInfoScreen.dart';
 import 'package:unites_flutter/src/ui/widgets/LittleWidgetsCollection.dart';
 
-class ParticipantsListScreen extends StatefulWidget {
-  String eventId;
-  ParticipantsListScreen({@required this.eventId});
-
+class ContactsListScreen extends StatefulWidget {
   @override
-  _ParticipantsListScreenState createState() => _ParticipantsListScreenState();
+  _ContactsListScreenState createState() => _ContactsListScreenState();
 }
 
-class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
-  final eventBloc = EventsBloc();
+class _ContactsListScreenState extends State<ContactsListScreen> {
+  final userBloc = UsersBloc();
 
   @override
   void initState() {
+    userBloc.fetchContacts();
     super.initState();
-    eventBloc.getEventParticipants(widget.eventId);
   }
 
   @override
   void dispose() {
-    eventBloc.dispose();
+    userBloc.dispose();
     super.dispose();
   }
 
@@ -33,14 +30,14 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Участники'),
+          title: Text('Контакты'),
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
           child: StreamBuilder<List<UserModel>>(
-            stream: eventBloc.participants,
+            stream: userBloc.getContacts,
             builder: (BuildContext context,
                 AsyncSnapshot<List<UserModel>> snapshot) {
               Widget child;
@@ -68,10 +65,8 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
                                       width: 50,
                                       height: 50,
                                       child: element.avatar != null
-                                          ? Image.network(
-                                              element.avatar,
-                                              fit: BoxFit.cover
-                                            )
+                                          ? Image.network(element.avatar,
+                                              fit: BoxFit.cover)
                                           : Center(
                                               child: Text(
                                                   '${element.firstName[0]}${element.lastName[0]}',

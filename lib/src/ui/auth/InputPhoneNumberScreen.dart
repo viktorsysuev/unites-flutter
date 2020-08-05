@@ -27,7 +27,7 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
         body: Stack(
       children: <Widget>[
         _showForm(),
@@ -38,14 +38,14 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   Widget showPhoneInput() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
-      child: new TextFormField(
+      child: TextFormField(
         controller: _phoneController,
         maxLines: 1,
         keyboardType: TextInputType.phone,
         autofocus: false,
-        decoration: new InputDecoration(
+        decoration: InputDecoration(
             hintText: 'Телефон',
-            icon: new Icon(
+            icon: Icon(
               Icons.phone,
               color: Colors.grey,
             )),
@@ -57,17 +57,17 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   }
 
   Widget showButton() {
-    return new Padding(
+    return Padding(
         padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
         child: SizedBox(
           height: 40.0,
-          child: new RaisedButton(
+          child: RaisedButton(
             elevation: 5.0,
-            shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0)),
             color: Colors.blue,
-            child: new Text('Отправить',
-                style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+            child: Text('Отправить',
+                style: TextStyle(fontSize: 20.0, color: Colors.white)),
             onPressed: () {
               final phone = _phoneController.text.trim();
               loginUser(phone, context);
@@ -77,12 +77,12 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   }
 
   Widget _showForm() {
-    return new Container(
+    return Container(
         margin: const EdgeInsets.only(top: 140.0),
         padding: EdgeInsets.all(16.0),
-        child: new Form(
+        child: Form(
           key: _formKey,
-          child: new ListView(
+          child: ListView(
             shrinkWrap: true,
             children: <Widget>[
               showPhoneInput(),
@@ -93,31 +93,31 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   }
 
   Future<bool> loginUser(String phone, BuildContext context) async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
+    var _auth = FirebaseAuth.instance;
 
-    _auth.verifyPhoneNumber(
+    await _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
           Navigator.of(context).pop();
 
-          AuthResult result = await _auth.signInWithCredential(credential);
+          var result = await _auth.signInWithCredential(credential);
 
-          FirebaseUser user = result.user;
+          var user = result.user;
 
           if (user != null) {
             final userExist = await userRepository.isUserExist();
             if (userExist) {
-              Navigator.push(
+              await Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Home()));
             } else {
-              Navigator.push(
+              await Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => RegistrationScreen()));
             }
           } else {
-            print("Error");
+            print('Error');
           }
         },
         verificationFailed: (AuthException exception) {
@@ -129,7 +129,7 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
               barrierDismissible: false,
               builder: (context) {
                 return AlertDialog(
-                  title: Text("Получили код?"),
+                  title: Text('Получили код?'),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
@@ -140,29 +140,29 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                   ),
                   actions: <Widget>[
                     FlatButton(
-                      child: Text("Подтвердить"),
+                      child: Text('Подтвердить'),
                       textColor: Colors.white,
                       color: Colors.blue,
                       onPressed: () async {
                         final code = _codeController.text.trim();
-                        AuthCredential credential =
+                        var credential =
                             PhoneAuthProvider.getCredential(
                                 verificationId: verificationId, smsCode: code);
 
-                        AuthResult result =
+                        var result =
                             await _auth.signInWithCredential(credential);
 
-                        FirebaseUser user = result.user;
+                        var user = result.user;
 
                         if (user != null) {
                           final userExist = await userRepository.isUserExist();
                           if (userExist) {
-                            Navigator.push(
+                            await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => Home()));
                           } else {
-                            Navigator.push(
+                            await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>

@@ -18,11 +18,11 @@ class _MainEventsScreenState extends State<MainEventsScreen> {
           appBar: AppBar(
             bottom: TabBar(
               tabs: [
-                Tab(text: "Список"),
-                Tab(text: "Карта"),
+                Tab(text: 'Список'),
+                Tab(text: 'Карта'),
               ],
             ),
-            title: Text("Мероприятия"),
+            title: Text('Мероприятия'),
           ),
           body: TabBarView(
             physics: NeverScrollableScrollPhysics(),

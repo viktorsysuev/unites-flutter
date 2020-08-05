@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/blocs/UsersBloc.dart';
+import 'package:unites_flutter/src/ui/contacts/ContactsListScreen.dart';
 import 'package:unites_flutter/src/ui/events/MainEventsScreen.dart';
 import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
@@ -15,7 +16,7 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     MainEventsScreen(),
-    PlaceholderWidget(Colors.deepOrange),
+    ContactsListScreen(),
     PlaceholderWidget(Colors.green),
     ProfileMainScreen()
   ];
@@ -45,16 +46,16 @@ class _HomeState extends State<Home> {
         onTap: onTabTapped, // new
         items: [
           BottomNavigationBarItem(
-            icon: new Icon(Icons.event),
-            title: new Text('Мероприятия'),
+            icon: Icon(Icons.event),
+            title: Text('Мероприятия'),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.group),
-            title: new Text('Контакты'),
+            icon: Icon(Icons.group),
+            title: Text('Контакты'),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.notifications),
-            title: new Text('Уведомления'),
+            icon: Icon(Icons.notifications),
+            title: Text('Уведомления'),
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text('Профиль'))
