@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
+import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/ui/events/ParticipantsListScreen.dart';
+import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
+import 'package:unites_flutter/src/ui/profile/UserInfoScreen.dart';
 import 'package:unites_flutter/src/ui/widgets/LittleWidgetsCollection.dart';
 
 class EventInfoScreen extends StatefulWidget {
@@ -40,6 +43,55 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
     super.dispose();
   }
 
+  Widget _buildParticipantsScroller(List<ParticipantsModel> participants) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2.0),
+      child: SizedBox.fromSize(
+        size: Size.fromHeight(75.0),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          itemCount: participants.length,
+          itemBuilder: (BuildContext context, int index) {
+            var user = participants[index];
+            return Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  UserInfoScreen(userId: user.userId)));
+                    },
+                    child: CircleAvatar(
+                      radius: 34,
+                      backgroundColor: EditProfileScreen.colorById(user.userId),
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 300,
+                          height: 300,
+                          child: user.avatar != null
+                              ? Image.network(
+                                  user.avatar,
+                                  fit: BoxFit.cover,
+                                )
+                              : Center(
+                                  child: Text(
+                                      '${user.firstName[0]}${user.lastName[0]}',
+                                      style: TextStyle(
+                                          fontSize: 24, color: Colors.white),
+                                      textAlign: TextAlign.center)),
+                        ),
+                      ),
+                    )));
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +99,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
           title: Text('Мероприятие'),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
           child: StreamBuilder<EventWithParticipants>(
@@ -75,7 +126,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                           style: TextStyle(fontSize: 16.0)),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(12.0),
+                      padding: EdgeInsets.all(16.0),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -111,7 +162,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                   style: TextStyle(
                                       decoration: TextDecoration.underline),
                                   text:
-                                      'Участников ${snapshot.data.participants.length}',
+                                      'Участники (${snapshot.data.participants.length}):',
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Navigator.push(
@@ -125,10 +176,10 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                             ),
                           ]),
                     ),
+                    _buildParticipantsScroller(snapshot.data.participants),
                     Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
                     Center(
-                      child: RaisedButton(
-                        color: Colors.lightBlue,
+                      child: OutlineButton(
                         child: Text('$buttonText'),
                         onPressed: () {
                           eventBloc
@@ -138,17 +189,19 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                       {
                                         print("left"),
                                         eventBloc.leftEvent(widget.eventId),
-                                        eventBloc.getEventWithParticipants(widget.eventId),
+                                        eventBloc.getEventWithParticipants(
+                                            widget.eventId),
                                       }
                                     else
                                       {
                                         print("join"),
                                         eventBloc.joinEvent(widget.eventId),
-                                        eventBloc.getEventWithParticipants(widget.eventId),
+                                        eventBloc.getEventWithParticipants(
+                                            widget.eventId),
                                       }
                                   });
                           setState(() {
-                            if(buttonText == 'Вступить'){
+                            if (buttonText == 'Вступить') {
                               buttonText = 'Покинуть мероприятие';
                             } else {
                               buttonText = 'Вступить';

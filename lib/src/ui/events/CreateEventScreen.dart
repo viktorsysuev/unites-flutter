@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
@@ -7,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
-import 'package:google_map_location_picker/generated/i18n.dart'
-    as location_picker;
-import 'package:google_map_location_picker/google_map_location_picker.dart';
 
 import '../../Home.dart';
 import 'SelectAddreesScreen.dart';

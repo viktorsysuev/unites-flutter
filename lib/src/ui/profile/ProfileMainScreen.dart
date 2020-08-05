@@ -48,6 +48,15 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
                   size: 26.0,
                 ),
               )),
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {},
+                child: Icon(
+                  Icons.exit_to_app,
+                  size: 26.0,
+                ),
+              )),
         ],
       ),
       body: StreamBuilder(
@@ -95,10 +104,12 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
                 style: TextStyle(fontSize: 22.0)),
           ),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-          Center(
-            child: Text('${snapshot.data.aboutMe}',
-                style: TextStyle(fontSize: 16.0)),
-          ),
+          Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text('${snapshot.data.aboutMe}',
+                    style: TextStyle(fontSize: 16.0)),
+              )),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Center(
             child: Text('${snapshot.data.company}',
@@ -125,13 +136,6 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
             ]),
           ),
           Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
-          Center(
-            child: RaisedButton(
-              color: Colors.lightBlue,
-              child: Text('Выйти'),
-              onPressed: () {},
-            ),
-          ),
         ]),
       ),
     );

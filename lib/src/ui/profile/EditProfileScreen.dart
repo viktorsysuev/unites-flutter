@@ -143,7 +143,6 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
       GestureDetector(
         onTap: () {
-          print("TAP");
           getImage();
         },
         child: CircleAvatar(

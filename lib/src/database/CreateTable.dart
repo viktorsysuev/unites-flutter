@@ -19,6 +19,9 @@ Map<String, String> createTables = {
 	      docId TEXT,
 	      eventId TEXT,
 	      userId TEXT,
+	      avatar TEXT,
+	      firstName TEXT,
+	      lastName TEXT,
 	      role TEXT,
 	      UNIQUE(docId)
 	      );""",

@@ -38,6 +38,9 @@ class EventRepository {
           participant = ParticipantsModel(),
           participant.eventId = value.documentID,
           participant.userId = currentUser.userId,
+          participant.avatar = currentUser.avatar,
+          participant.firstName = currentUser.firstName,
+          participant.lastName = currentUser.lastName,
           participant.role = 'owner',
           db
               .collection('events')
@@ -63,7 +66,8 @@ class EventRepository {
 
   joinEvent(String eventId) async {
     var userId = await userRepository.getCurrentUserId();
-    var participant = ParticipantsModel(userId: userId, eventId: eventId, role: 'member');
+    var user = await userRepository.getUser(userId);
+    var participant = ParticipantsModel(userId: userId, eventId: eventId, avatar: user.avatar, firstName: user.firstName, lastName: user.lastName, role: 'member');
     await db
         .collection('events')
         .document(eventId)

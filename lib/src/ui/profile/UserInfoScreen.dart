@@ -82,10 +82,12 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 style: TextStyle(fontSize: 22.0)),
           ),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-          Center(
-            child: Text('${snapshot.data.aboutMe}',
-                style: TextStyle(fontSize: 16.0)),
-          ),
+          Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text('${snapshot.data.aboutMe}',
+                    style: TextStyle(fontSize: 16.0)),
+              )),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Center(
             child: Text('${snapshot.data.company}',
@@ -115,9 +117,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             ]),
           ),
-          Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
+          Container(margin: EdgeInsets.only(top: 10.0, bottom: 10.0)),
           Center(
-            child: RaisedButton(
+            child: OutlineButton(
               color: Colors.lightBlue,
               child: Text('Написать сообщение'),
               onPressed: () {
