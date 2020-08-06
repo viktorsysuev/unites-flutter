@@ -101,10 +101,9 @@ class DatabaseProvider {
   }
 
   Future<List<EventWithParticipants>> getMyEvents(String currentUserId) async {
-    var result = List<EventWithParticipants>();
+    var result = <EventWithParticipants>[];
     final db = await database;
     var res = await db.rawQuery("SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
-    print('res ${res.length} $res');
     await Future.forEach(res, (element)  async  {
       var newEventWithParticipants = EventWithParticipants();
       var event = EventModel.fromDB(element);
@@ -117,10 +116,8 @@ class DatabaseProvider {
         users.add(user);
       });
       newEventWithParticipants.participants = users;
-      print('participants ${participants.length}');
       result.add(newEventWithParticipants);
     });
-    print('events with members ${result.length}');
     return result;
   }
 

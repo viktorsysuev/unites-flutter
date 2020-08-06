@@ -93,9 +93,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                         .spaceBetween,
                                                 children: <Widget>[
                                                   Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Expanded(
+                                                    alignment: Alignment.topLeft,
                                                       child: Container(
                                                         padding:
                                                             EdgeInsets.only(
@@ -151,7 +149,6 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                           ],
                                                         ),
                                                       ),
-                                                    ),
                                                   ),
                                                   Align(
                                                       alignment:
@@ -244,6 +241,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                           }))
                 ]);
               } else {
+                eventBloc.getMyEventsWithParticipants();
                 child = Column();
               }
               return child;
