@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/EventWithMembers.dart';
+import 'package:unites_flutter/src/models/EventWithParticipants.dart';
 import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
@@ -110,6 +112,12 @@ class EventRepository {
 
   Future<List<UserModel>> getEventParticipantsFomDB(String eventId) async {
     return DatabaseProvider.db.getEventParticipants(eventId);
+  }
+
+  Future<List<EventWithParticipants>> getMyEvents() async {
+    var currentUserId = await userRepository.getCurrentUserId();
+    var events = await DatabaseProvider.db.getMyEvents(currentUserId);
+    return events;
   }
 
   Future<List<EventModel>> getAllEventsFromDB() async {

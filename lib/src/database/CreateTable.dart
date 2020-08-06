@@ -23,7 +23,7 @@ Map<String, String> createTables = {
 	      firstName TEXT,
 	      lastName TEXT,
 	      role TEXT,
-	      UNIQUE(docId)
+	      UNIQUE(eventId, userId)
 	      );""",
   'users': """CREATE TABLE users (
 	      id INTEGER PRIMARY KEY AUTOINCREMENT,

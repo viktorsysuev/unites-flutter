@@ -55,4 +55,4 @@ Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
       'token': instance.token,
       'aboutMe': instance.aboutMe,
       'avatar': instance.avatar,
-    };
+};

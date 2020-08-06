@@ -157,7 +157,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                       user.interests = interestsController.text;
                       user.aboutMe = aboutController.text;
                       userRepository.createNewUser(user);
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => Home()),
                       );

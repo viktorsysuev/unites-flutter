@@ -5,6 +5,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:unites_flutter/src/database/CreateTable.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/EventWithMembers.dart';
+import 'package:unites_flutter/src/models/EventWithParticipants.dart';
 import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 
@@ -70,7 +72,8 @@ class DatabaseProvider {
 
   void deleteParticipant(String eventId, String userId) async {
     final db = await database;
-    await db.rawQuery("DELETE FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
+    await db.rawQuery(
+        "DELETE FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
   }
 
   Future<EventModel> getEvent(String eventId) async {
@@ -89,11 +92,36 @@ class DatabaseProvider {
   Future<List<UserModel>> getContacts(String userId) async {
     final db = await database;
     var contacts = <UserModel>{};
-    var res = await db.rawQuery("SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
+    var res = await db.rawQuery(
+        "SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
     res.forEach((element) {
       contacts.add(UserModel.fromJson(element));
     });
     return contacts.toList();
+  }
+
+  Future<List<EventWithParticipants>> getMyEvents(String currentUserId) async {
+    var result = List<EventWithParticipants>();
+    final db = await database;
+    var res = await db.rawQuery("SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
+    print('res ${res.length} $res');
+    await Future.forEach(res, (element)  async  {
+      var newEventWithParticipants = EventWithParticipants();
+      var event = EventModel.fromDB(element);
+      newEventWithParticipants.eventModel = event;
+      var participants = await db.rawQuery("SELECT * FROM participants WHERE eventId = '${event.id}'");
+      var users = List<ParticipantsModel>();
+
+      participants.forEach((element) {
+        var user = ParticipantsModel.fromJson(element);
+        users.add(user);
+      });
+      newEventWithParticipants.participants = users;
+      print('participants ${participants.length}');
+      result.add(newEventWithParticipants);
+    });
+    print('events with members ${result.length}');
+    return result;
   }
 
   Future<int> insertData(String nameTable, Map<String, dynamic> data) async {

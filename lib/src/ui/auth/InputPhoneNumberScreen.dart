@@ -157,12 +157,12 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                         if (user != null) {
                           final userExist = await userRepository.isUserExist();
                           if (userExist) {
-                            await Navigator.push(
+                            await Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => Home()));
                           } else {
-                            await Navigator.push(
+                            await Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>

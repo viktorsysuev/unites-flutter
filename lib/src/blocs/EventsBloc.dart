@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
+import 'package:unites_flutter/src/models/EventWithMembers.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
 import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
@@ -18,14 +19,17 @@ class EventsBloc {
 
   final _participantsController = StreamController<List<UserModel>>.broadcast();
 
-  final _eventWithParticipantsController =
-      StreamController<EventWithParticipants>.broadcast();
+  final _myEventsWithParticipantsController = StreamController<List<EventWithParticipants>>.broadcast();
+
+  final _eventWithParticipantsController = StreamController<EventWithParticipants>.broadcast();
 
   Stream<List<EventModel>> get events => _eventsController.stream;
 
   Stream<List<UserModel>> get participants => _participantsController.stream;
 
   Stream<EventWithParticipants> get eventWithParticipants => _eventWithParticipantsController.stream;
+  
+  Stream<List<EventWithParticipants>> get myEventsWithParticipants => _myEventsWithParticipantsController.stream;
 
   Stream<EventModel> get getEvent => _eventFetcher.stream;
 
@@ -66,6 +70,11 @@ class EventsBloc {
         }
       });
     });
+  }
+
+  void getMyEventsWithParticipants() async {
+    var events = await _eventRepository.getMyEvents();
+    _myEventsWithParticipantsController.sink.add(events);
   }
 
   void addParticipantsListener() async {

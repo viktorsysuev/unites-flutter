@@ -116,10 +116,12 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                           style: TextStyle(fontSize: 22.0)),
                     ),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                    Center(
-                      child: Text('${snapshot.data.eventModel.description}',
-                          style: TextStyle(fontSize: 16.0)),
-                    ),
+                    Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text('${snapshot.data.eventModel.description}',
+                              style: TextStyle(fontSize: 16.0)),
+                        )),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Center(
                       child: Text('${snapshot.data.eventModel.company}',
