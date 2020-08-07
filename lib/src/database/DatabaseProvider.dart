@@ -44,6 +44,11 @@ class DatabaseProvider {
     return events;
   }
 
+  void deleteEvent(String eventId) async {
+    final db = await database;
+    await db.rawQuery("DELETE FROM events WHERE eventId = '$eventId'");
+  }
+
   Future<List<UserModel>> getEventParticipants(String eventId) async {
     final db = await database;
     var res = await db.query(
@@ -109,13 +114,13 @@ class DatabaseProvider {
       var event = EventModel.fromDB(element);
       newEventWithParticipants.eventModel = event;
       var participants = await db.rawQuery("SELECT * FROM participants WHERE eventId = '${event.id}'");
-      var users = List<ParticipantsModel>();
+      var users = Set<ParticipantsModel>();
 
       participants.forEach((element) {
         var user = ParticipantsModel.fromJson(element);
         users.add(user);
       });
-      newEventWithParticipants.participants = users;
+      newEventWithParticipants.participants = users.toList();
       result.add(newEventWithParticipants);
     });
     return result;

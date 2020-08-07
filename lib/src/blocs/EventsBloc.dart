@@ -62,11 +62,17 @@ class EventsBloc {
   void addEventsListener() async {
     var firestoreDB = Firestore.instance;
     firestoreDB.collection('events').snapshots().listen((event) {
-      event.documentChanges.forEach((element) {
+      event.documentChanges.forEach((element) async {
         if (element.type == DocumentChangeType.added) {
           var event = EventModel.fromJson(element.document.data);
-          DatabaseProvider.db.insertData('events', event.toMap());
+          await DatabaseProvider.db.insertData('events', event.toMap());
           inAddEvent.add(event);
+          getMyEventsWithParticipants();
+        } else if(element.type == DocumentChangeType.removed){
+          var event = EventModel.fromJson(element.document.data);
+          await DatabaseProvider.db.deleteEvent(event.id);
+          getEvents();
+          getMyEventsWithParticipants();
         }
       });
     });
@@ -84,14 +90,17 @@ class EventsBloc {
         .snapshots()
         .listen((participant) {
       participant.documentChanges.forEach((element) async {
-        if (element.type == DocumentChangeType.modified) {
+        if (element.type == DocumentChangeType.modified){
           var participant = ParticipantsModel.fromJson(element.document.data);
-          DatabaseProvider.db.insertData('participants', participant.toJson());
+          await DatabaseProvider.db.insertData('participants', participant.toJson());
           getEventWithParticipants(participant.eventId);
+          getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
+          print('listener removed');
           var participant = ParticipantsModel.fromJson(element.document.data);
-          DatabaseProvider.db.deleteParticipant(participant.eventId, participant.userId);
+          await DatabaseProvider.db.deleteParticipant(participant.eventId, participant.userId);
           getEventWithParticipants(participant.eventId);
+          getMyEventsWithParticipants();
         }
       });
     });

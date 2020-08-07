@@ -55,9 +55,9 @@ class EventRepository {
                         .insertData('participants', participant.toJson()),
                     db
                         .collection('events')
-                        .document(event.id)
+                        .document(participant.eventId)
                         .collection('participants')
-                        .document('value.documentID')
+                        .document(value.documentID)
                         .updateData(participant.toJson())
                   }),
           event.id = value.documentID,
@@ -69,16 +69,23 @@ class EventRepository {
   joinEvent(String eventId) async {
     var userId = await userRepository.getCurrentUserId();
     var user = await userRepository.getUser(userId);
-    var participant = ParticipantsModel(userId: userId, eventId: eventId, avatar: user.avatar, firstName: user.firstName, lastName: user.lastName, role: 'member');
+    var participant = ParticipantsModel(
+        userId: userId,
+        eventId: eventId,
+        avatar: user.avatar,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: 'member');
     await db
         .collection('events')
         .document(eventId)
         .collection('participants')
         .add(participant.toJson())
         .then((value) => {
-          print('update participant ${value.documentID}'),
+              print('update participant ${value.documentID}'),
               participant.docId = value.documentID,
-              DatabaseProvider.db.insertData('participants', participant.toJson()),
+              DatabaseProvider.db
+                  .insertData('participants', participant.toJson()),
               db
                   .collection('events')
                   .document(eventId)
@@ -122,6 +129,10 @@ class EventRepository {
 
   Future<List<EventModel>> getAllEventsFromDB() async {
     return DatabaseProvider.db.getAllEvents();
+  }
+
+  void deleteEvent(String eventId) async {
+    DatabaseProvider.db.deleteEvent(eventId);
   }
 
   Future<EventModel> getEvent(String eventId) async {
