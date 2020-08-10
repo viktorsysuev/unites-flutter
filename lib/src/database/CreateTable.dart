@@ -10,7 +10,7 @@ Map<String, String> createTables = {
           email TEXT,
           address TEXT,
           coordinates TEXT,
-          start start,
+          start TEXT,
           end TEXT,
           UNIQUE(eventId)
        );""",
@@ -39,4 +39,30 @@ Map<String, String> createTables = {
 	      avatar TEXT,
 	      UNIQUE(userId)
 	      );""",
+
+  'comments': """CREATE TABLE comments (
+	      id INTEGER PRIMARY KEY AUTOINCREMENT,
+	      commentId TEXT,
+	      authorId TEXT,
+	      createdAt TEXT,
+	      eventId TEXT,
+	      text TEXT,
+	      UNIQUE(commentId)
+	      );""",
+
+  'comments_with_users': """
+	        CREATE VIEW comments_with_users
+          AS
+          SELECT
+            commentid,
+            authorid,
+            eventid,
+            text,
+            createdat,
+            users.firstname as firstName,
+            users.lastname as lastName,
+            users.avatar as avatar
+          FROM comments
+          INNER JOIN users ON users.userId = comments.authorId
+            ;""",
 };

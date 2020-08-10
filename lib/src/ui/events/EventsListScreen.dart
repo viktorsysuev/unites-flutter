@@ -98,7 +98,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                         padding:
                                                             EdgeInsets.only(
                                                                 left: 12.0,
-                                                                top: 12.0,
+                                                                top: 9.0,
                                                                 right: 8),
                                                         child: Column(
                                                           crossAxisAlignment:
@@ -110,6 +110,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                           children: <Widget>[
                                                             Text(
                                                               '${event.eventModel.name}',
+                                                              maxLines: 2,
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .white,
@@ -123,7 +124,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                                 padding:
                                                                     EdgeInsets
                                                                         .all(
-                                                                            5)),
+                                                                            4)),
                                                             Text(
                                                               '${event.eventModel.description}',
                                                               maxLines: 2,
@@ -138,7 +139,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                                 padding:
                                                                     EdgeInsets
                                                                         .all(
-                                                                            5)),
+                                                                            4)),
                                                             Text(
                                                               '${dateFormat.format(event.eventModel.start)}',
                                                               style: TextStyle(
@@ -155,7 +156,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                           Alignment.bottomLeft,
                                                       child: Padding(
                                                           padding:
-                                                              EdgeInsets.only(left: 12.0, bottom: 14.0),
+                                                              EdgeInsets.only(left: 12.0, bottom: 8.0),
                                                           child: Stack(
                                                             children: [
                                                               CircleAvatar(

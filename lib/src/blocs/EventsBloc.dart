@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
+import 'package:unites_flutter/src/models/CommentModel.dart';
+import 'package:unites_flutter/src/models/CommentWithUser.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithMembers.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
@@ -19,17 +21,25 @@ class EventsBloc {
 
   final _participantsController = StreamController<List<UserModel>>.broadcast();
 
-  final _myEventsWithParticipantsController = StreamController<List<EventWithParticipants>>.broadcast();
+  final _commentsController = StreamController<List<CommentWithUser>>.broadcast();
 
-  final _eventWithParticipantsController = StreamController<EventWithParticipants>.broadcast();
+  final _myEventsWithParticipantsController =
+      StreamController<List<EventWithParticipants>>.broadcast();
+
+  final _eventWithParticipantsController =
+      StreamController<EventWithParticipants>.broadcast();
 
   Stream<List<EventModel>> get events => _eventsController.stream;
 
   Stream<List<UserModel>> get participants => _participantsController.stream;
 
-  Stream<EventWithParticipants> get eventWithParticipants => _eventWithParticipantsController.stream;
-  
-  Stream<List<EventWithParticipants>> get myEventsWithParticipants => _myEventsWithParticipantsController.stream;
+  Stream<List<CommentWithUser>> get comments => _commentsController.stream;
+
+  Stream<EventWithParticipants> get eventWithParticipants =>
+      _eventWithParticipantsController.stream;
+
+  Stream<List<EventWithParticipants>> get myEventsWithParticipants =>
+      _myEventsWithParticipantsController.stream;
 
   Stream<EventModel> get getEvent => _eventFetcher.stream;
 
@@ -68,7 +78,7 @@ class EventsBloc {
           await DatabaseProvider.db.insertData('events', event.toMap());
           inAddEvent.add(event);
           getMyEventsWithParticipants();
-        } else if(element.type == DocumentChangeType.removed){
+        } else if (element.type == DocumentChangeType.removed) {
           var event = EventModel.fromJson(element.document.data);
           await DatabaseProvider.db.deleteEvent(event.id);
           getEvents();
@@ -90,15 +100,17 @@ class EventsBloc {
         .snapshots()
         .listen((participant) {
       participant.documentChanges.forEach((element) async {
-        if (element.type == DocumentChangeType.modified){
+        if (element.type == DocumentChangeType.modified) {
           var participant = ParticipantsModel.fromJson(element.document.data);
-          await DatabaseProvider.db.insertData('participants', participant.toJson());
+          await DatabaseProvider.db
+              .insertData('participants', participant.toJson());
           getEventWithParticipants(participant.eventId);
           getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
           print('listener removed');
           var participant = ParticipantsModel.fromJson(element.document.data);
-          await DatabaseProvider.db.deleteParticipant(participant.eventId, participant.userId);
+          await DatabaseProvider.db
+              .deleteParticipant(participant.eventId, participant.userId);
           getEventWithParticipants(participant.eventId);
           getMyEventsWithParticipants();
         }
@@ -107,8 +119,19 @@ class EventsBloc {
   }
 
   getEventParticipants(String eventId) async {
-    var participants = await _eventRepository.getEventParticipantsFomDB(eventId);
+    var participants =
+        await _eventRepository.getEventParticipantsFomDB(eventId);
     _participantsController.sink.add(participants);
+  }
+
+  getEventCommetns(String eventId) async {
+    var comments = await _eventRepository.getEventComments(eventId);
+    _commentsController.sink.add(comments);
+  }
+
+  sendComment(String text, String eventId) async {
+    await _eventRepository.addNewComment(text, eventId);
+    getEventCommetns(eventId);
   }
 
   createEvent(EventModel eventModel) {

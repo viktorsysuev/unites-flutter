@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unites_flutter/src/database/DatabaseProvider.dart';
+import 'package:unites_flutter/src/models/CommentModel.dart';
+import 'package:unites_flutter/src/models/CommentWithUser.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithMembers.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
@@ -25,6 +27,12 @@ class EventRepository {
                   DatabaseProvider.db.insertData('participants', element.data);
                 })
               });
+      element.reference.collection('comments').getDocuments().then((value) => {
+            value.documents.forEach((element) {
+              DatabaseProvider.db.insertData(
+                  'comments', CommentModel.fromJson(element.data).toMap());
+            })
+          });
       events.add(EventModel.fromJson(element.data));
       DatabaseProvider.db
           .insertData('events', EventModel.fromJson(element.data).toMap());
@@ -64,6 +72,26 @@ class EventRepository {
           DatabaseProvider.db.insertData('events', event.toMap()),
           updateEvent(event)
         });
+  }
+
+  void addNewComment(String text, String eventId) async {
+    var userId = await userRepository.getCurrentUserId();
+    var currentUser = await userRepository.getUser(userId);
+    var newComment = CommentModel();
+    newComment.eventId = eventId;
+    newComment.authorId = userId;
+    newComment.createdAt = DateTime.now();
+    newComment.text = text;
+    await db
+        .collection('events')
+        .document(eventId)
+        .collection('comments')
+        .add(newComment.toJson())
+        .then((value) => {
+              newComment.commentId = value.documentID,
+              value.updateData(newComment.toJson()),
+              DatabaseProvider.db.insertData('comments', newComment.toMap())
+            });
   }
 
   joinEvent(String eventId) async {
@@ -119,6 +147,10 @@ class EventRepository {
 
   Future<List<UserModel>> getEventParticipantsFomDB(String eventId) async {
     return DatabaseProvider.db.getEventParticipants(eventId);
+  }
+
+  Future<List<CommentWithUser>> getEventComments(String eventId) async {
+    return DatabaseProvider.db.getEventComments(eventId);
   }
 
   Future<List<EventWithParticipants>> getMyEvents() async {

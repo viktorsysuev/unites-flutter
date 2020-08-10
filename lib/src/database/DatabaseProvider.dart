@@ -4,6 +4,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:unites_flutter/src/database/CreateTable.dart';
+import 'package:unites_flutter/src/models/CommentModel.dart';
+import 'package:unites_flutter/src/models/CommentWithUser.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithMembers.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
@@ -26,8 +28,8 @@ class DatabaseProvider {
   }
 
   initDatabase() async {
-    var documentsDirectory = await getApplicationDocumentsDirectory();
-    var path = join(documentsDirectory.path, 'UnitesDatabase.db');
+    var dbDirectory = await getDatabasesPath();
+    var path = join(dbDirectory, 'UnitesDatabase.db');
     return await openDatabase(path, version: 4, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await createTables.forEach((name, text) async => await db.execute(text));
@@ -36,8 +38,8 @@ class DatabaseProvider {
 
   Future<List<EventModel>> getAllEvents() async {
     final db = await database;
-    var res = await db.query("events");
-    var events = List<EventModel>();
+    var res = await db.query('events');
+    var events = <EventModel>[];
     res.forEach((element) {
       events.add(EventModel.fromDB(element));
     });
@@ -53,11 +55,21 @@ class DatabaseProvider {
     final db = await database;
     var res = await db.query(
         "users WHERE userId in (SELECT userId FROM participants WHERE eventId = '$eventId')");
-    var participants = List<UserModel>();
+    var participants = <UserModel>[];
     res.forEach((element) {
       participants.add(UserModel.fromJson(element));
     });
     return participants;
+  }
+
+  Future<List<CommentWithUser>> getEventComments(String eventId) async {
+    final db = await database;
+    var res = await db.query("comments_with_users WHERE eventId = '$eventId' ORDER BY createdAt ASC");
+    var comments = <CommentWithUser>[];
+    res.forEach((element) {
+      comments.add(CommentWithUser.fromDB(element));
+    });
+    return comments;
   }
 
   Future<int> idParticipant(String eventId, String userId) async {
@@ -108,12 +120,14 @@ class DatabaseProvider {
   Future<List<EventWithParticipants>> getMyEvents(String currentUserId) async {
     var result = <EventWithParticipants>[];
     final db = await database;
-    var res = await db.rawQuery("SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
-    await Future.forEach(res, (element)  async  {
+    var res = await db.rawQuery(
+        "SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
+    await Future.forEach(res, (element) async {
       var newEventWithParticipants = EventWithParticipants();
       var event = EventModel.fromDB(element);
       newEventWithParticipants.eventModel = event;
-      var participants = await db.rawQuery("SELECT * FROM participants WHERE eventId = '${event.id}'");
+      var participants = await db
+          .rawQuery("SELECT * FROM participants WHERE eventId = '${event.id}'");
       var users = Set<ParticipantsModel>();
 
       participants.forEach((element) {
