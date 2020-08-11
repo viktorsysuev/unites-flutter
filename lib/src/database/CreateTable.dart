@@ -50,6 +50,16 @@ Map<String, String> createTables = {
 	      UNIQUE(commentId)
 	      );""",
 
+  'notifications': """CREATE TABLE notifications (
+	      id INTEGER PRIMARY KEY AUTOINCREMENT,
+	      notificationId TEXT,
+	      eventId TEXT,
+	      state TEXT,
+	      createdAt TEXT,
+	      initiatorId TEXT,
+	      UNIQUE(notificationId)
+	      );""",
+
   'comments_with_users': """
 	        CREATE VIEW comments_with_users
           AS

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
+import 'package:unites_flutter/src/blocs/NotificaitionBloc.dart';
 import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/ui/contacts/ContactsListScreen.dart';
 import 'package:unites_flutter/src/ui/events/MainEventsScreen.dart';
+import 'package:unites_flutter/src/ui/notifications/NotificatonsScreen.dart';
 import 'package:unites_flutter/src/ui/profile/ProfileMainScreen.dart';
 
 class Home extends StatefulWidget {
@@ -17,7 +19,7 @@ class _HomeState extends State<Home> {
   final List<Widget> _children = [
     MainEventsScreen(),
     ContactsListScreen(),
-    PlaceholderWidget(Colors.green),
+    NotificationScreen(),
     ProfileMainScreen()
   ];
 
@@ -30,6 +32,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     UsersBloc().initUsers();
+    NotificationBloc().initNotifications();
     super.initState();
   }
 

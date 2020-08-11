@@ -108,7 +108,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Выберите адрес'),
-        backgroundColor: Colors.green[700],
       ),
       body: GoogleMap(
         myLocationEnabled: true,

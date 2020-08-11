@@ -1,0 +1,6 @@
+enum NotificationState {
+  EVENT_CHANGED,
+  EVENT_NEW_PARTICIPANT,
+  EVENT_NEW_COMMENT
+}
+

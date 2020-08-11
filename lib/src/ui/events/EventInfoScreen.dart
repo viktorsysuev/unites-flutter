@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:unites_flutter/src/blocs/EventsBloc.dart';
 import 'package:unites_flutter/src/models/CommentModel.dart';
@@ -26,6 +27,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
   final formatter = DateFormat('yyyy-MM-dd hh:mm');
   var buttonText = '';
   var textEditingController = TextEditingController();
+  static const LatLng _center = const LatLng(45.521563, -122.677433);
 
   @override
   void initState() {
@@ -115,43 +117,63 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                   itemBuilder: (BuildContext context, int index) {
                     return Column(children: [
                       Row(children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: EditProfileScreen.colorById(
-                              snapshot.data[index].authorId),
-                          child: ClipOval(
-                            child: SizedBox(
-                              width: 300,
-                              height: 300,
-                              child: snapshot.data[index].avatar != null
-                                  ? Image.network(
-                                      snapshot.data[index].avatar,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Center(
-                                      child: Text(
-                                          '${snapshot.data[index].firstName[0]}${snapshot.data[index].firstName[0]}',
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              color: Colors.white),
-                                          textAlign: TextAlign.center)),
-                            ),
-                          ),
-                        ),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => UserInfoScreen(
+                                          userId:
+                                              snapshot.data[index].authorId)));
+                            },
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor: EditProfileScreen.colorById(
+                                  snapshot.data[index].authorId),
+                              child: ClipOval(
+                                child: SizedBox(
+                                  width: 300,
+                                  height: 300,
+                                  child: snapshot.data[index].avatar != null
+                                      ? Image.network(
+                                          snapshot.data[index].avatar,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Center(
+                                          child: Text(
+                                              '${snapshot.data[index].firstName[0]}${snapshot.data[index].firstName[0]}',
+                                              style: TextStyle(
+                                                  fontSize: 24,
+                                                  color: Colors.white),
+                                              textAlign: TextAlign.center)),
+                                ),
+                              ),
+                            )),
                         Container(
                             padding: EdgeInsets.only(left: 10.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                    child: Text(
-                                      '${snapshot.data[index].firstName} ${snapshot.data[index].lastName}',
-                                      style: TextStyle(fontSize: 16.0),
-                                    )),
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UserInfoScreen(
+                                                          userId: snapshot
+                                                              .data[index]
+                                                              .authorId)));
+                                        },
+                                        child: Text(
+                                          '${snapshot.data[index].firstName} ${snapshot.data[index].lastName}',
+                                          style: TextStyle(fontSize: 16.0),
+                                        ))),
                                 Container(
                                     padding: EdgeInsets.only(top: 6.0),
                                     child: Align(
-                                      alignment: Alignment.centerLeft,
+                                        alignment: Alignment.centerLeft,
                                         child: Text(
                                             '${getCommentTime(snapshot.data[index].createdAt)}',
                                             textAlign: TextAlign.left,
@@ -206,7 +228,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                     ),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Center(
                           child: Text('${snapshot.data.eventModel.description}',
                               style: TextStyle(fontSize: 16.0)),
@@ -253,7 +275,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                   style: TextStyle(
                                       decoration: TextDecoration.underline),
                                   text:
-                                      'Участники (${snapshot.data.participants.length}):',
+                                      'Участники:',
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Navigator.push(
@@ -284,7 +306,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                               .then((isParticipant) => {
                                     if (isParticipant)
                                       {
-                                        print("left"),
                                         eventBloc.leftEvent(widget.eventId),
                                         eventBloc.getEventWithParticipants(
                                             widget.eventId),
@@ -342,9 +363,12 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                               child: IconButton(
                                 icon: Icon(Icons.send),
                                 onPressed: () => {
-                                  eventBloc.sendComment(
-                                      textEditingController.text,
-                                      widget.eventId),
+                                  if (textEditingController.text.isNotEmpty)
+                                    {
+                                      eventBloc.sendComment(
+                                          textEditingController.text,
+                                          widget.eventId)
+                                    },
                                   textEditingController.clear()
                                 },
                                 color: Colors.blueAccent,

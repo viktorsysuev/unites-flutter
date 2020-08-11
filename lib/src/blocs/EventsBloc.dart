@@ -23,11 +23,9 @@ class EventsBloc {
 
   final _commentsController = StreamController<List<CommentWithUser>>.broadcast();
 
-  final _myEventsWithParticipantsController =
-      StreamController<List<EventWithParticipants>>.broadcast();
+  final _myEventsWithParticipantsController = StreamController<List<EventWithParticipants>>.broadcast();
 
-  final _eventWithParticipantsController =
-      StreamController<EventWithParticipants>.broadcast();
+  final _eventWithParticipantsController = StreamController<EventWithParticipants>.broadcast();
 
   Stream<List<EventModel>> get events => _eventsController.stream;
 

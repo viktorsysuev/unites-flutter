@@ -9,6 +9,7 @@ import 'package:unites_flutter/src/models/CommentWithUser.dart';
 import 'package:unites_flutter/src/models/EventModel.dart';
 import 'package:unites_flutter/src/models/EventWithMembers.dart';
 import 'package:unites_flutter/src/models/EventWithParticipants.dart';
+import 'package:unites_flutter/src/models/NotificationModel.dart';
 import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 
@@ -70,6 +71,16 @@ class DatabaseProvider {
       comments.add(CommentWithUser.fromDB(element));
     });
     return comments;
+  }
+
+  Future<List<NotificationModel>> getUserNotifications() async {
+    final db = await database;
+    var res = await db.query('notifications ORDER BY createdAt ASC');
+    var notifications = <NotificationModel>[];
+    res.forEach((element) {
+      notifications.add(NotificationModel.fromDB(element));
+    });
+    return notifications;
   }
 
   Future<int> idParticipant(String eventId, String userId) async {
