@@ -108,8 +108,9 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
           if (user != null) {
             final userExist = await userRepository.isUserExist();
             if (userExist) {
-              await Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Home()));
+              await Navigator.of(context)
+                  .pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Home()), (Route<dynamic> route) => false);
             } else {
               await Navigator.push(
                   context,
@@ -160,10 +161,6 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                             await Navigator.of(context)
                                 .pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
                                 Home()), (Route<dynamic> route) => false);
-//                            await Navigator.pushReplacement(
-//                                context,
-//                                MaterialPageRoute(
-//                                    builder: (context) => Home()));
                           } else {
                             await Navigator.pushReplacement(
                                 context,

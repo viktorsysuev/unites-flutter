@@ -4,6 +4,7 @@ import 'package:unites_flutter/src/models/ParticipantsModel.dart';
 class EventModel {
   String id;
   String name;
+  String owner;
   String description;
   String company;
   String phoneNumber;
@@ -25,6 +26,7 @@ class EventModel {
       this.address,
       this.coordinates,
       this.start,
+      this.owner,
       this.end});
 
   factory EventModel.fromJson(Map<dynamic, dynamic> json) =>
@@ -38,6 +40,7 @@ class EventModel {
     return EventModel(
         id: table['eventId'],
         name: table['name'],
+        owner: table['owner'],
         description: table['description'],
         company: table['company'],
         phoneNumber: table['phoneNumber'],
@@ -58,6 +61,7 @@ EventModel _EventModelFromJson(Map<dynamic, dynamic> json) {
   return EventModel(
     id: json['id'] as String,
     name: json['name'] as String,
+    owner: json['owner'] as String,
     description: json['description'] as String,
     company: json['company'] as String,
     phoneNumber: json['phoneNumber'] as String,
@@ -73,6 +77,7 @@ Map<String, dynamic> _EventModelToJson(EventModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'owner': instance.owner,
       'description': instance.description,
       'company': instance.company,
       'phoneNumber': instance.phoneNumber,
@@ -86,6 +91,7 @@ Map<String, dynamic> _EventModelToJson(EventModel instance) =>
 Map<String, dynamic> _EventModelToMap(EventModel instance) => <String, dynamic>{
       'eventId': instance.id,
       'name': instance.name,
+      'owner': instance.owner,
       'description': instance.description,
       'company': instance.company,
       'phoneNumber': instance.phoneNumber,

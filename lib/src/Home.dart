@@ -33,6 +33,7 @@ class _HomeState extends State<Home> {
   void initState() {
     UsersBloc().initUsers();
     NotificationBloc().initNotifications();
+    NotificationBloc().addNotificationsListener();
     super.initState();
   }
 

@@ -4,6 +4,7 @@ Map<String, String> createTables = {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
           eventId TEXT,
           name TEXT,
+          owner TEXT,
           description TEXT,
           company TEXT,
           phoneNumber TEXT,
@@ -54,9 +55,12 @@ Map<String, String> createTables = {
 	      id INTEGER PRIMARY KEY AUTOINCREMENT,
 	      notificationId TEXT,
 	      eventId TEXT,
+	      eventName TEXT,
 	      state TEXT,
 	      createdAt TEXT,
 	      initiatorId TEXT,
+	      initiatorName TEXT,
+	      seenByMe INTEGER,
 	      UNIQUE(notificationId)
 	      );""",
 

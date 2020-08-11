@@ -75,7 +75,7 @@ class DatabaseProvider {
 
   Future<List<NotificationModel>> getUserNotifications() async {
     final db = await database;
-    var res = await db.query('notifications ORDER BY createdAt ASC');
+    var res = await db.query('notifications ORDER BY createdAt DESC');
     var notifications = <NotificationModel>[];
     res.forEach((element) {
       notifications.add(NotificationModel.fromDB(element));

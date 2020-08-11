@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
+import 'package:unites_flutter/src/ui/notifications/NotificatonsScreen.dart';
 
 import '../../Home.dart';
 

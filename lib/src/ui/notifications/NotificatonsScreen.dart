@@ -8,14 +8,22 @@ import 'package:unites_flutter/src/models/NotificationState.dart';
 class NotificationScreen extends StatefulWidget {
   @override
   _NotificationScreenState createState() => _NotificationScreenState();
+
+  void someFunction() {
+
+  }
+
+  final _publicNotificationsBloc = NotificationBloc();
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
   final notificationsBloc = NotificationBloc();
+  final privateNotificationsBloc = NotificationBloc();
 
   @override
   void initState() {
     notificationsBloc.getNotifications();
+    notificationsBloc.addNotificationsListener();
     super.initState();
   }
 
@@ -35,7 +43,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               if (snapshot.hasData) {
                 snapshot.data.forEach((element) {
                   bufferWidgets.add(Padding(
-                      padding: EdgeInsets.only(left: 8, right: 8),
+                      padding: EdgeInsets.only(left: 6, right: 6, top: 4),
                       child: Card(
                           child: ListTile(
                         onTap: () {
@@ -66,11 +74,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     var res = '';
 
     if(notificationModel.state == NotificationState.EVENT_CHANGED){
-      res = 'Какое-то мероприятие изменилось';
+      res = 'Мероприятие  `${notificationModel.eventName}` изменилось';
     } else if(notificationModel.state == NotificationState.EVENT_NEW_PARTICIPANT){
-      res = 'Кто-то вступил в Ваше мероприятие';
+      res = '${notificationModel.initiatorName} вступил в Ваше мероприятие `${notificationModel.eventName}`';
     } else {
-      res = 'Кто-то прокомментировал ваше мероприятие';
+      res = '${notificationModel.initiatorName} прокомментировал ваше мероприятие `${notificationModel.eventName}`';
     }
 
     return res;

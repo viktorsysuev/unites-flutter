@@ -44,6 +44,7 @@ class EventRepository {
     var userId = await userRepository.getCurrentUserId();
     var currentUser = await userRepository.getUser(userId);
     ParticipantsModel participant;
+    event.owner = userId;
     await db.collection('events').add(event.toJson()).then((value) => {
           participant = ParticipantsModel(),
           participant.eventId = value.documentID,
