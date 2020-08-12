@@ -18,21 +18,24 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
   final _codeController = TextEditingController();
   var _verificationId = '';
   final UserRepository userRepository = UserRepository();
-  var _auth = FirebaseAuth.instance;
+  final _auth = FirebaseAuth.instance;
   var progressVisible = false;
+  final _formKey = GlobalKey<FormState>();
 
   String _code;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     loginUser(widget.phoneNumber, context);
     return Scaffold(
-        body: Container(
+        body: Form(
+        key: _formKey,
+        child: Container(
       alignment: Alignment.bottomCenter,
       margin: EdgeInsets.only(top: 160),
       padding: EdgeInsets.all(12.0),
@@ -79,6 +82,7 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
               if (user != null) {
                 final userExist = await userRepository.isUserExist();
                 if (userExist) {
+                  print('navigate to home');
                   await Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) => Home()),
                       (Route<dynamic> route) => false);
@@ -105,7 +109,7 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
                   ]))),
         ],
       ),
-    ));
+    )));
   }
 
   Future<bool> loginUser(String phone, BuildContext context) async {
@@ -113,10 +117,8 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
-          Navigator.of(context).pop();
           var result = await _auth.signInWithCredential(credential);
           var user = result.user;
-          print('verificationCompleted user${user} is null ${user == null}');
           if (user != null) {
             final userExist = await userRepository.isUserExist();
             if (userExist) {

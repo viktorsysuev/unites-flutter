@@ -128,22 +128,23 @@ class DatabaseProvider {
     return contacts.toList();
   }
 
+  // Нужно найти другое решение, список формируется долго
   Future<List<EventWithParticipants>> getMyEvents(String currentUserId) async {
     var result = <EventWithParticipants>[];
     final db = await database;
-    var res = await db.rawQuery(
-        "SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
+    var participants = await db.rawQuery('SELECT * FROM participants');
+    var res = await db.rawQuery("SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
     await Future.forEach(res, (element) async {
       var newEventWithParticipants = EventWithParticipants();
       var event = EventModel.fromDB(element);
       newEventWithParticipants.eventModel = event;
-      var participants = await db
-          .rawQuery("SELECT * FROM participants WHERE eventId = '${event.id}'");
-      var users = Set<ParticipantsModel>();
+      var users = <ParticipantsModel>{};
 
       participants.forEach((element) {
         var user = ParticipantsModel.fromJson(element);
-        users.add(user);
+        if(user.eventId == event.id){
+          users.add(user);
+        }
       });
       newEventWithParticipants.participants = users.toList();
       result.add(newEventWithParticipants);

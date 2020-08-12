@@ -153,7 +153,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                         ),
                                                       ),
                                                   ),
-                                                  Align(
+                                                  event.participants.isNotEmpty ? Align(
                                                       alignment:
                                                           Alignment.bottomLeft,
                                                       child: Padding(
@@ -237,7 +237,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                                                                       ))
                                                                   : Container()
                                                             ],
-                                                          )))
+                                                          ))) : Container()
 
 //
                                                 ])))));
