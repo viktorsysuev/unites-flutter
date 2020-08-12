@@ -13,14 +13,14 @@ class UserRepository {
     return doc.exists;
   }
 
-  Future<UserModel> createNewUser(UserModel user) async {
+  void createNewUser(UserModel user) async {
     var currentUser = await auth.currentUser();
     user.userId = currentUser.uid;
     user.phone = currentUser.phoneNumber;
-    db.collection('users').document(user.userId).setData(user.toJson());
+    await db.collection('users').document(user.userId).setData(user.toJson());
   }
 
-  Future<UserModel> updateUser(UserModel user) async {
+  void updateUser(UserModel user) async {
     var userId = await getCurrentUserId();
     user.userId = userId;
     await DatabaseProvider.db.insertData('users', user.toJson());
@@ -42,5 +42,9 @@ class UserRepository {
   Future<String> getCurrentUserId() async {
     var user = await auth.currentUser();
     return user.uid;
+  }
+
+  void logout() async {
+    await auth.signOut();
   }
 }

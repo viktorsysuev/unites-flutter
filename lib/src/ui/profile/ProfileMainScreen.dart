@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:unites_flutter/src/blocs/UsersBloc.dart';
 import 'package:unites_flutter/src/models/UserModel.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
+import 'package:unites_flutter/src/ui/auth/InputPhoneNumberScreen.dart';
 import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
 
 class ProfileMainScreen extends StatefulWidget {
@@ -51,7 +52,13 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  UserRepository().logout();
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => InputPhoneNumberScreen()),
+                      (Route<dynamic> route) => false);
+                },
                 child: Icon(
                   Icons.exit_to_app,
                   size: 26.0,

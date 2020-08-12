@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unites_flutter/src/resources/UserRepository.dart';
+import 'package:unites_flutter/src/ui/auth/InputCodeScreen.dart';
 import 'package:unites_flutter/src/ui/auth/RegistrationScreen.dart';
 import 'package:unites_flutter/src/ui/profile/EditProfileScreen.dart';
 
@@ -12,7 +13,7 @@ class InputPhoneNumberScreen extends StatefulWidget {
 }
 
 class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
-  final _formKey = new GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
@@ -37,22 +38,24 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
 
   Widget showPhoneInput() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
+      padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
       child: TextFormField(
-        controller: _phoneController,
-        maxLines: 1,
-        keyboardType: TextInputType.phone,
-        autofocus: false,
-        decoration: InputDecoration(
-            hintText: 'Телефон',
-            icon: Icon(
-              Icons.phone,
-              color: Colors.grey,
-            )),
-        validator: (value) =>
-            value.isEmpty ? 'Поле не может быть пустым' : null,
-        onSaved: (value) => _phone = value.trim(),
-      ),
+          controller: _phoneController,
+          maxLines: 1,
+          keyboardType: TextInputType.phone,
+          autofocus: false,
+          decoration: InputDecoration(
+              hintText: 'Телефон',
+              icon: Icon(
+                Icons.phone,
+                color: Colors.grey,
+              )),
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Введите номер';
+            }
+            return null;
+          }),
     );
   }
 
@@ -70,7 +73,15 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                 style: TextStyle(fontSize: 20.0, color: Colors.white)),
             onPressed: () {
               final phone = _phoneController.text.trim();
-              loginUser(phone, context);
+              if (phone.isNotEmpty) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => InputCodeScreen(
+                              phoneNumber: phone,
+                            )));
+              }
+//              loginUser(phone, context);
             },
           ),
         ));
@@ -85,98 +96,23 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
           child: ListView(
             shrinkWrap: true,
             children: <Widget>[
+              Container(
+                  child: Text(
+                'Вход',
+                style: TextStyle(fontSize: 24),
+                textAlign: TextAlign.center,
+              )),
+              Container(
+                  padding: EdgeInsets.only(top: 12),
+                  child: Text(
+                    'Мы отправим Вам проверочный код на указанный номер',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  )),
               showPhoneInput(),
               showButton(),
             ],
           ),
         ));
-  }
-
-  Future<bool> loginUser(String phone, BuildContext context) async {
-    var _auth = FirebaseAuth.instance;
-
-    await _auth.verifyPhoneNumber(
-        phoneNumber: phone,
-        timeout: Duration(seconds: 60),
-        verificationCompleted: (AuthCredential credential) async {
-          Navigator.of(context).pop();
-
-          var result = await _auth.signInWithCredential(credential);
-
-          var user = result.user;
-
-          if (user != null) {
-            final userExist = await userRepository.isUserExist();
-            if (userExist) {
-              await Navigator.of(context)
-                  .pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                  Home()), (Route<dynamic> route) => false);
-            } else {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RegistrationScreen()));
-            }
-          } else {
-            print('Error');
-          }
-        },
-        verificationFailed: (AuthException exception) {
-          print(exception.message);
-        },
-        codeSent: (String verificationId, [int forceResendingToken]) {
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text('Получили код?'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextField(
-                        controller: _codeController,
-                      ),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Подтвердить'),
-                      textColor: Colors.white,
-                      color: Colors.blue,
-                      onPressed: () async {
-                        final code = _codeController.text.trim();
-                        var credential =
-                            PhoneAuthProvider.getCredential(
-                                verificationId: verificationId, smsCode: code);
-
-                        var result =
-                            await _auth.signInWithCredential(credential);
-
-                        var user = result.user;
-
-                        if (user != null) {
-                          final userExist = await userRepository.isUserExist();
-                          if (userExist) {
-                            await Navigator.of(context)
-                                .pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                                Home()), (Route<dynamic> route) => false);
-                          } else {
-                            await Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        RegistrationScreen()));
-                          }
-                        } else {
-                          print("Error");
-                        }
-                      },
-                    )
-                  ],
-                );
-              });
-        },
-        codeAutoRetrievalTimeout: null);
   }
 }
