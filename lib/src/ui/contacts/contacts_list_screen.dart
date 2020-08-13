@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
@@ -35,7 +36,6 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
           title: Text('Контакты'),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
           child: StreamBuilder<List<UserModel>>(
@@ -44,7 +44,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 AsyncSnapshot<List<UserModel>> snapshot) {
               Widget child;
               var bufferWidgets = <Widget>[];
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data.isNotEmpty) {
                 snapshot.data.forEach((element) {
                   bufferWidgets.add(GestureDetector(
                       onTap: () => Navigator.push(
@@ -112,7 +112,20 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
               } else if (snapshot.hasError) {
                 child = Center(child: WidgetErrorLoad());
               } else {
-                child = Center(child: WidgetDataLoad());
+                child = Column(children: [
+                  Container(
+                      margin: EdgeInsets.only(top: 100),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/images/broke.svg',
+                        width: 100,
+                        height: 160,
+                      )),
+                  Container(padding: EdgeInsets.only(top: 16)),
+                  Text('В контактах пока никого нет',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      textAlign: TextAlign.center)
+                ]);;
               }
               return child;
             },

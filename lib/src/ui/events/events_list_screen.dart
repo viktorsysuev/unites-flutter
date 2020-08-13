@@ -44,7 +44,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
             builder: (BuildContext context,
                 AsyncSnapshot<List<EventWithParticipants>> snapshot) {
               Widget child;
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data.isNotEmpty) {
                 child = Column(children: [
                   Padding(
                       padding: EdgeInsets.all(16),
