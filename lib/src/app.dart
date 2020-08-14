@@ -18,7 +18,7 @@ class App extends StatelessWidget {
           controller: themeController,
           child: MaterialApp(
             theme: _buildCurrentTheme(),
-            home: Home(),
+            home: IntroScreen(),
           ),
         );
       },

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
 import 'package:unites_flutter/src/ui/events/event_info_screen.dart';
@@ -17,7 +18,7 @@ class EventsOnMapScreen extends StatefulWidget {
 }
 
 class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
-  EventsBloc eventBloc;
+  final eventBloc = getIt<EventsBloc>();
 
   String _darkMapStyle;
   String _normalMapStyle;
@@ -36,7 +37,6 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
 
   @override
   void didChangeDependencies() {
-    eventBloc = EventsBloc();
     _getCurrentLocation();
     eventBloc.getEvents();
     super.didChangeDependencies();
@@ -44,7 +44,7 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
 
   @override
   void dispose() {
-    eventBloc.dispose();
+//    eventBloc.dispose();
     super.dispose();
   }
 

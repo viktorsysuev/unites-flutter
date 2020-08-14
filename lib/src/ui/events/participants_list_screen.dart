@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/app.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
@@ -16,7 +17,7 @@ class ParticipantsListScreen extends StatefulWidget {
 }
 
 class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
-  EventsBloc eventBloc;
+  final eventBloc = getIt<EventsBloc>();
 
   @override
   void initState() {
@@ -25,14 +26,13 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
 
   @override
   void didChangeDependencies() {
-    eventBloc = EventsBloc();
     eventBloc.getEventParticipants(widget.eventId);
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    eventBloc.dispose();
+//    eventBloc.dispose();
     super.dispose();
   }
 

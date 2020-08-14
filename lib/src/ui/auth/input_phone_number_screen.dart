@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:unites_flutter/src/ui/auth/input_code_screen.dart';
 import 'package:unites_flutter/src/ui/auth/registration_screen.dart';
@@ -18,7 +19,7 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
 
-  final UserRepository userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   String _phone;
   String _errorMessage;

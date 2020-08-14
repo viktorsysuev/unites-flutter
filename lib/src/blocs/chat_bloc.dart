@@ -1,12 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:unites_flutter/injection.config.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/models/message_model.dart';
 import 'package:unites_flutter/src/resources/chat_repository.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
+
+@injectable
 class ChatsBloc {
-  var chatRepository = ChatRepository();
-  var userRepository = UserRepository();
+
+  var chatRepository = getIt<ChatRepository>();
+
+  var userRepository = getIt<UserRepository>();
 
   final _messageFetcher = PublishSubject<List<MessageModel>>();
 

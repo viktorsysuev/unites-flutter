@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
@@ -19,7 +20,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   final companyController = TextEditingController();
   final usefulController = TextEditingController();
 
-  final UserRepository userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   @override
   Widget build(BuildContext context) {

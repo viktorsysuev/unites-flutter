@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
 import 'package:unites_flutter/src/models/event_with_members.dart';
@@ -18,12 +19,12 @@ class EventsListScreen extends StatefulWidget {
 
 class _EventsListScreenState extends State<EventsListScreen> {
   DateFormat dateFormat = DateFormat("dd MMMM yyyy");
-  EventsBloc eventBloc;
+  final eventBloc = getIt<EventsBloc>();
+
 
 
   @override
   void didChangeDependencies() {
-    eventBloc = EventsBloc();
     eventBloc.addEventsListener();
     eventBloc.getMyEventsWithParticipants();
     eventBloc.getEvents();
@@ -32,7 +33,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
   @override
   void dispose() {
-    eventBloc.dispose();
+//    eventBloc.dispose();
     super.dispose();
   }
 

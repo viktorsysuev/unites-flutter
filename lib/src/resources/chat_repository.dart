@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/models/chat_model.dart';
 import 'package:unites_flutter/src/models/message_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
+
+@injectable
 class ChatRepository {
   final db = Firestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
-  var userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   void startNewChat(String userId, String text) async {
     var currentUserId = await userRepository.getCurrentUserId();

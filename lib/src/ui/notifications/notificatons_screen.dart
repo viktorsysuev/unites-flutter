@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/blocs/notification_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
@@ -10,19 +11,14 @@ class NotificationScreen extends StatefulWidget {
   @override
   _NotificationScreenState createState() => _NotificationScreenState();
 
-  void someFunction() {}
-
-  final _publicNotificationsBloc = NotificationBloc();
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  final notificationsBloc = NotificationBloc();
-  final privateNotificationsBloc = NotificationBloc();
+  final notificationBloc = getIt<NotificationBloc>();
 
   @override
   void initState() {
-    notificationsBloc.getNotifications();
-    notificationsBloc.addNotificationsListener();
+    notificationBloc.getNotifications();
     super.initState();
   }
 
@@ -34,7 +30,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           scrollDirection: Axis.vertical,
           controller: ScrollController(),
           child: StreamBuilder<List<NotificationModel>>(
-            stream: notificationsBloc.notifications,
+            stream: notificationBloc.notifications,
             builder: (BuildContext context,
                 AsyncSnapshot<List<NotificationModel>> snapshot) {
               Widget child;

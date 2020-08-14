@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/comment_model.dart';
 import 'package:unites_flutter/src/models/comment_with_user.dart';
@@ -12,8 +14,9 @@ import 'package:unites_flutter/src/models/participants_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/event_repository.dart';
 
+@injectable
 class EventsBloc {
-  final _eventRepository = EventRepository();
+  final _eventRepository = getIt<EventRepository>();
 
   final _eventFetcher = StreamController<EventModel>.broadcast();
 
@@ -21,11 +24,14 @@ class EventsBloc {
 
   final _participantsController = StreamController<List<UserModel>>.broadcast();
 
-  final _commentsController = StreamController<List<CommentWithUser>>.broadcast();
+  final _commentsController =
+      StreamController<List<CommentWithUser>>.broadcast();
 
-  final _myEventsWithParticipantsController = StreamController<List<EventWithParticipants>>.broadcast();
+  final _myEventsWithParticipantsController =
+      StreamController<List<EventWithParticipants>>.broadcast();
 
-  final _eventWithParticipantsController = StreamController<EventWithParticipants>.broadcast();
+  final _eventWithParticipantsController =
+      StreamController<EventWithParticipants>.broadcast();
 
   Stream<List<EventModel>> get events => _eventsController.stream;
 

@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/notification_model.dart';
 import 'package:unites_flutter/src/models/notification_state.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
+
+@injectable
 class NotificationRepository {
 
-  final userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   final firestore = Firestore.instance;
 

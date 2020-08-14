@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
@@ -41,15 +42,14 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   final companyController = TextEditingController();
   final usefulController = TextEditingController();
 
-  final UserRepository userRepository = UserRepository();
-  UsersBloc userBloc;
+  var userRepository = getIt<UserRepository>();
+  final userBloc = getIt<UsersBloc>();
 
   File _image;
   String avatarUrl;
 
   @override
   void didChangeDependencies() {
-    userBloc = UsersBloc();
     userBloc.fetchCurrentUser();
     super.didChangeDependencies();
   }

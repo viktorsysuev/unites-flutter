@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/comment_model.dart';
 import 'package:unites_flutter/src/models/comment_with_user.dart';
@@ -11,9 +13,11 @@ import 'package:unites_flutter/src/models/participants_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
+
+@injectable
 class EventRepository {
   final db = Firestore.instance;
-  final userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   Future<List<EventModel>> initEvents() async {
     var events = List<EventModel>();

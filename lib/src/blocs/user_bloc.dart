@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
+
+@injectable
 class UsersBloc {
-  final _userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
 
   final _userFetcher = PublishSubject<UserModel>();
   final _contactsFetcher = PublishSubject<List<UserModel>>();
@@ -24,18 +28,18 @@ class UsersBloc {
   }
 
   fetchCurrentUser() async {
-    var userId = await _userRepository.getCurrentUserId();
-    var user = await _userRepository.getUser(userId);
+    var userId = await userRepository.getCurrentUserId();
+    var user = await userRepository.getUser(userId);
     _userFetcher.sink.add(user);
   }
 
   getUserById(String userId) async {
-    var user = await _userRepository.getUser(userId);
+    var user = await userRepository.getUser(userId);
     _userFetcher.sink.add(user);
   }
 
   fetchContacts() async {
-    var userId = await _userRepository.getCurrentUserId();
+    var userId = await userRepository.getCurrentUserId();
     var contacts = await DatabaseProvider.db.getContacts(userId);
     _contactsFetcher.sink.add(contacts);
   }

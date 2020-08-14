@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
 
@@ -20,7 +21,7 @@ class CreateEventScreen extends StatefulWidget {
 class _CreateEventScreenState extends State<CreateEventScreen> {
   Completer<GoogleMapController> _controller = Completer();
 
-  EventsBloc eventBloc;
+  final eventBloc = getIt<EventsBloc>();
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
@@ -28,7 +29,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   void didChangeDependencies() {
-    eventBloc = EventsBloc();
     super.didChangeDependencies();
   }
 

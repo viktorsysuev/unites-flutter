@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
@@ -13,12 +14,11 @@ class ContactsListScreen extends StatefulWidget {
 }
 
 class _ContactsListScreenState extends State<ContactsListScreen> {
-  UsersBloc userBloc;
+  final userBloc = getIt<UsersBloc>();
 
 
   @override
   void didChangeDependencies() {
-    userBloc = UsersBloc();
     userBloc.fetchContacts();
     super.didChangeDependencies();
   }

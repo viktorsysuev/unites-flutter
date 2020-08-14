@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
@@ -16,13 +17,12 @@ class UserInfoScreen extends StatefulWidget {
 }
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
-  final userRepository = UserRepository();
-  UsersBloc userBloc;
+  var userRepository = getIt<UserRepository>();
+  final userBloc = getIt<UsersBloc>();
 
 
   @override
   void didChangeDependencies() {
-    userBloc = UsersBloc();
     userBloc.getUserById(widget.userId);
     super.didChangeDependencies();
   }

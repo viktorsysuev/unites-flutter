@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 
 import '../../home.dart';
@@ -17,7 +18,7 @@ class InputCodeScreen extends StatefulWidget {
 class _InputCodeScreenState extends State<InputCodeScreen> {
   final _codeController = TextEditingController();
   var _verificationId = '';
-  final UserRepository userRepository = UserRepository();
+  var userRepository = getIt<UserRepository>();
   final _auth = FirebaseAuth.instance;
   var progressVisible = false;
   final _formKey = GlobalKey<FormState>();

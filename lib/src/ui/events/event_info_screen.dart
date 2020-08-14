@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/comment_model.dart';
 import 'package:unites_flutter/src/models/comment_with_user.dart';
@@ -23,7 +24,7 @@ class EventInfoScreen extends StatefulWidget {
 }
 
 class _EventInfoScreenState extends State<EventInfoScreen> {
-  EventsBloc eventBloc;
+  final eventBloc = getIt<EventsBloc>();
   final formatter = DateFormat('yyyy-MM-dd hh:mm');
   var buttonText = '';
   var textEditingController = TextEditingController();
@@ -31,7 +32,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
 
   @override
   void didChangeDependencies() {
-    eventBloc = EventsBloc();
     eventBloc.getEventCommetns(widget.eventId);
     eventBloc.addParticipantsListener();
     eventBloc.isMember(widget.eventId).then((isParticipant) => {
@@ -46,7 +46,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
 
   @override
   void dispose() {
-    eventBloc.dispose();
+//    eventBloc.dispose();
     super.dispose();
   }
 

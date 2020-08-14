@@ -42,6 +42,8 @@ dependencies:
   flutter_svg: ^0.18.0
   provider: ^4.3.2
   shared_preferences: ^0.5.8
+  get_it: ^4.0.4
+  injectable: ^1.0.4
 
 
   # Add the following three lines
@@ -56,6 +58,7 @@ dev_dependencies:
     sdk: flutter
   pedantic: ^1.9.0
   build_runner: ^1.10.0
+  injectable_generator: ^1.0.4
 
 
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
@@ -16,12 +17,11 @@ class ProfileMainScreen extends StatefulWidget {
 }
 
 class ProfileMainScreenState extends State<ProfileMainScreen> {
-  final userRepository = UserRepository();
-  UsersBloc userBloc;
+  var userRepository = getIt<UserRepository>();
+  final userBloc = getIt<UsersBloc>();
 
   @override
   void didChangeDependencies() {
-    userBloc = UsersBloc();
     userBloc.fetchCurrentUser();
     super.didChangeDependencies();
   }
@@ -56,7 +56,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
                 onTap: () {
-                  UserRepository().logout();
+                  userRepository.logout();
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (context) => InputPhoneNumberScreen()),

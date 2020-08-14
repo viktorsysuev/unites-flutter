@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/blocs/notification_bloc.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
@@ -16,6 +17,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
+
+  final userBloc = getIt<UsersBloc>();
+  final notificationBloc = getIt<NotificationBloc>();
+
   final List<Widget> _children = [
     MainEventsScreen(),
     ContactsListScreen(),
@@ -31,9 +36,9 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    UsersBloc().initUsers();
-    NotificationBloc().initNotifications();
-    NotificationBloc().addNotificationsListener();
+    userBloc.initUsers();
+    notificationBloc.initNotifications();
+    notificationBloc.addNotificationsListener();
     super.initState();
   }
 
