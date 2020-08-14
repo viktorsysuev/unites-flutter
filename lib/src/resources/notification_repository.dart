@@ -18,7 +18,6 @@ class NotificationRepository {
         .collection('notifications')
         .getDocuments();
     notifications.documents.forEach((element) {
-      print('insert notification ${element.data}');
       DatabaseProvider.db.insertData('notifications', NotificationModel.fromJson(element.data).toMap());
     });
   }

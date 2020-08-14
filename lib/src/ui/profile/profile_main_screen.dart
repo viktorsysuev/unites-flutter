@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:unites_flutter/src/ui/auth/input_phone_number_screen.dart';
 import 'package:unites_flutter/src/ui/profile/edit_profile_screen.dart';
+import 'package:unites_flutter/src/util/theme_controller.dart';
 
 class ProfileMainScreen extends StatefulWidget {
   @override
@@ -23,6 +25,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
     userBloc.fetchCurrentUser();
     super.didChangeDependencies();
   }
+
   @override
   void dispose() {
     userBloc.dispose();
@@ -70,7 +73,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
         stream: userBloc.getUser,
         builder: (context, AsyncSnapshot<UserModel> snapshot) {
           if (snapshot.hasData) {
-            return buildInfo(snapshot);
+            return buildInfo(snapshot, context);
           } else if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           }
@@ -80,7 +83,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
     );
   }
 
-  Widget buildInfo(AsyncSnapshot<UserModel> snapshot) {
+  Widget buildInfo(AsyncSnapshot<UserModel> snapshot, BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(children: <Widget>[
@@ -123,7 +126,7 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
                 style: TextStyle(fontSize: 16.0)),
           ),
           Padding(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.only(left: 12.0, right: 12.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
                     Widget>[
@@ -142,7 +145,24 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
               Text('${snapshot.data.useful}', style: TextStyle(fontSize: 16.0)),
             ]),
           ),
-          Container(margin: EdgeInsets.only(top: 20.0, bottom: 20.0)),
+          Row(
+            children: [
+              Container(padding: EdgeInsets.only(left: 12.0)),
+              Text('Ночной режим', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+              Container(padding: EdgeInsets.only(left: 8.0)),
+              Switch(
+                  value: ThemeController.of(context).currentTheme == 'dark',
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      if(newValue == true){
+                        ThemeController.of(context).setTheme('dark');
+                      } else{
+                        ThemeController.of(context).setTheme('light');
+                      }
+                    });
+                  })
+            ],
+          )
         ]),
       ),
     );

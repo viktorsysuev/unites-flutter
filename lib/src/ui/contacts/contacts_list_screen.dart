@@ -90,7 +90,6 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                     Text(
                                       '${element.firstName} ${element.lastName}',
                                       style: TextStyle(
-                                        color: Colors.white,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16.0,
                                       ),

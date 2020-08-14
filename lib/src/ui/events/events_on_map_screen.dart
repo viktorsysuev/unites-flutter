@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
 import 'package:unites_flutter/src/ui/events/event_info_screen.dart';
 import 'package:unites_flutter/src/ui/widgets/little_widgets_collection.dart';
+import 'package:unites_flutter/src/util/theme_controller.dart';
 
 class EventsOnMapScreen extends StatefulWidget {
   @override
@@ -16,8 +19,18 @@ class EventsOnMapScreen extends StatefulWidget {
 class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
   EventsBloc eventBloc;
 
+  String _darkMapStyle;
+  String _normalMapStyle;
+
   @override
   void initState() {
+    super.initState();
+    rootBundle.loadString('assets/map_style/dark_map_style.json').then((string) {
+      _darkMapStyle = string;
+    });
+    rootBundle.loadString('assets/map_style/normal_map_style.json').then((string) {
+      _normalMapStyle = string;
+    });
     super.initState();
   }
 
@@ -52,6 +65,8 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
     mapController = controller;
   }
 
+
+
   _getCurrentLocation() async {
     await _geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
@@ -75,6 +90,15 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (mapController != null ) {
+      if (ThemeController.of(context).currentTheme == 'dark') {
+        mapController.setMapStyle(_darkMapStyle);
+      }
+      else {
+        mapController.setMapStyle(_normalMapStyle);
+      }
+    }
     return Scaffold(
       body: StreamBuilder<List<EventModel>>(
         stream: eventBloc.events,

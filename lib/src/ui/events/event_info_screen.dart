@@ -29,18 +29,17 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
   var textEditingController = TextEditingController();
   static const LatLng _center = const LatLng(45.521563, -122.677433);
 
-
   @override
   void didChangeDependencies() {
     eventBloc = EventsBloc();
     eventBloc.getEventCommetns(widget.eventId);
     eventBloc.addParticipantsListener();
     eventBloc.isMember(widget.eventId).then((isParticipant) => {
-      if (isParticipant)
-        {buttonText = 'Покинуть мероприятие'}
-      else
-        {buttonText = 'Присоединиться'}
-    });
+          if (isParticipant)
+            {buttonText = 'Покинуть мероприятие'}
+          else
+            {buttonText = 'Присоединиться'}
+        });
     eventBloc.getEventWithParticipants(widget.eventId);
     super.didChangeDependencies();
   }
@@ -145,8 +144,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                           child: Text(
                                               '${snapshot.data[index].firstName[0]}${snapshot.data[index].firstName[0]}',
                                               style: TextStyle(
-                                                  fontSize: 24,
-                                                  color: Colors.white),
+                                                  fontSize: 24),
                                               textAlign: TextAlign.center)),
                                 ),
                               ),
@@ -178,9 +176,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                         alignment: Alignment.centerLeft,
                                         child: Text(
                                             '${getCommentTime(snapshot.data[index].createdAt)}',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                color: Colors.white54)))),
+                                            textAlign: TextAlign.left))),
                               ],
                             ))
                       ]),
@@ -190,7 +186,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 '${snapshot.data[index].text}',
-                                style: TextStyle(color: Colors.white70),
                                 textAlign: TextAlign.left,
                               )))
                     ]);
@@ -224,10 +219,12 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                 child = SingleChildScrollView(
                   child: Column(children: <Widget>[
                     Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
-                    Center(
-                      child: Text('${snapshot.data.eventModel.name}',
-                          style: TextStyle(fontSize: 22.0)),
-                    ),
+                    Padding(
+                        padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                        child: Center(
+                          child: Text('${snapshot.data.eventModel.name}',
+                              style: TextStyle(fontSize: 22.0)),
+                        )),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Padding(
                         padding: EdgeInsets.only(left: 16.0, right: 16.0),
@@ -238,6 +235,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Center(
                       child: Text('${snapshot.data.eventModel.company}',
+                          textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 16.0)),
                     ),
                     Padding(
@@ -276,8 +274,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                               text: TextSpan(
                                   style: TextStyle(
                                       decoration: TextDecoration.underline),
-                                  text:
-                                      'Участники:',
+                                  text: 'Участники:',
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
                                       Navigator.push(
@@ -398,7 +395,6 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
             },
           ),
         ));
-    ;
   }
 
   String getCommentTime(DateTime date) {
