@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/main.dart';
+import 'package:unites_flutter/src/blocs/chat_bloc.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/comment_model.dart';
 import 'package:unites_flutter/src/models/comment_with_user.dart';

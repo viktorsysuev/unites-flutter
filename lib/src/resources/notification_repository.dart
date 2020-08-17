@@ -27,7 +27,24 @@ class NotificationRepository {
   }
 
   Future<List<NotificationModel>> getNotifications() async {
-      return DatabaseProvider.db.getUserNotifications();
+    return DatabaseProvider.db.getUserNotifications();
   }
 
+  Future<int> getUnreadCountNotifications() async {
+    return DatabaseProvider.db.getUnreadCountNotifications();
+  }
+
+  Future<void> setNotificationsAsRead() async {
+    await DatabaseProvider.db.setNotificationsAsRead();
+    var currentUserId = await userRepository.getCurrentUserId();
+    await firestore
+        .collection('users')
+        .document(currentUserId)
+        .collection('notifications')
+        .getDocuments().then((value) => {
+          value.documents.forEach((element) {
+            element.reference.updateData({'seenByMe': true});
+          })
+    });
+  }
 }

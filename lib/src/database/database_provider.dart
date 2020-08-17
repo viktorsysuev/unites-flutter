@@ -83,6 +83,18 @@ class DatabaseProvider {
     return notifications;
   }
 
+  Future<int> getUnreadCountNotifications() async {
+    final db = await database;
+    var res = await db.rawQuery('SELECT COUNT(*) FROM notifications WHERE seenByMe = 0');
+
+    return res.first.values.first;
+  }
+
+  void setNotificationsAsRead() async {
+    final db = await database;
+    await db.rawQuery('UPDATE notifications SET seenByMe = 1');
+  }
+
   Future<int> idParticipant(String eventId, String userId) async {
     final db = await database;
     var res = await db.rawQuery(

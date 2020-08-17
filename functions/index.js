@@ -126,4 +126,39 @@ exports.sendNewParticipantNotifications = functions.firestore.document('events/{
 });
 
 
+exports.sendParticipantLeftNotifications = functions.firestore.document('events/{eventId}/participants/{userId}').onDelete( async (snapshot, context) => {
+    const data = snapshot.data();
+    const user = await admin.firestore().collection('users').doc(data.userId).get();
+    const eventId = context.params.eventId;
+
+    const timestamp = admin.firestore.FieldValue.serverTimestamp();
+    const event = await admin.firestore().collection('events').doc(eventId).get();
+    const owner = await admin.firestore().collection('users').doc(event.data().owner).get();
+    const fullName = user.data().firstName + ' ' + user.data().lastName;
+
+    admin.firestore().collection('users')
+                        .doc(owner.data().userId)
+                        .collection('notifications')
+                        .add({
+                               state: "EVENT_LEFT_PARTICIPANT",
+                               createdAt: timestamp,
+                               eventId: eventId,
+                               initiatorId: user.data().userId,
+                               initiatorName: fullName,
+                               seenByMe: false,
+                               eventName: event.data().name
+                        }).then(snapshot => {
+                            admin.firestore().collection('users').doc(owner.data().userId).collection('notifications').doc(snapshot.id).update({
+                                                                                                                                                    notificationId: snapshot.id
+                                                                                                                                                  });
+
+                              return null;
+                            }).catch(err => {
+                                      console.log('Error updating documents', err);
+                                     });
+
+
+});
+
+
 

@@ -29,9 +29,11 @@ GetIt $initGetIt(
   gh.factory<ChatsBloc>(() => ChatsBloc());
   gh.factory<EventRepository>(() => EventRepository());
   gh.factory<EventsBloc>(() => EventsBloc());
-  gh.factory<NotificationBloc>(() => NotificationBloc());
   gh.factory<NotificationRepository>(() => NotificationRepository());
   gh.factory<UserRepository>(() => UserRepository());
   gh.factory<UsersBloc>(() => UsersBloc());
+
+  // Eager singletons must be registered in the right order
+  gh.singleton<NotificationBloc>(NotificationBloc());
   return get;
 }

@@ -31,7 +31,7 @@ class NotificationModel {
         createdAt: DateTime.parse(table['createdAt']),
         eventId: table['eventId'],
         eventName: table['eventName'],
-        seenByMe: table['seenByMen'] == 1 ? true : false,
+        seenByMe: table['seenByMe'] == 1 ? true : false,
         state: NotificationState.values.firstWhere((e) => e.toString() == 'NotificationState.' + table['state'], orElse: () => null));
   }
 

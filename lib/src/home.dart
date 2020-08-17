@@ -20,6 +20,7 @@ class _HomeState extends State<Home> {
 
   final userBloc = getIt<UsersBloc>();
   final notificationBloc = getIt<NotificationBloc>();
+  var unreadNotifications = 0;
 
   final List<Widget> _children = [
     MainEventsScreen(),
@@ -39,6 +40,12 @@ class _HomeState extends State<Home> {
     userBloc.initUsers();
     notificationBloc.initNotifications();
     notificationBloc.addNotificationsListener();
+    notificationBloc.getUnreadNotification();
+    notificationBloc.countUnread.listen((event) {
+      setState(() {
+        unreadNotifications = event;
+      });
+    });
     super.initState();
   }
 
@@ -50,9 +57,10 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-        currentIndex:
-            _currentIndex, // this will be set when a new tab is tapped
-        onTap: onTabTapped, // new
+        currentIndex: _currentIndex,
+        // this will be set when a new tab is tapped
+        onTap: onTabTapped,
+        // new
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.event),
@@ -63,7 +71,35 @@ class _HomeState extends State<Home> {
             title: Text('Контакты'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+            icon: Stack(
+              children: <Widget>[
+                Icon(Icons.notifications),
+                Positioned(
+                  right: 0,
+                  child: unreadNotifications > 0
+                      ? Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 12,
+                            minHeight: 12,
+                          ),
+                          child: Text(
+                            '$unreadNotifications',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : Container(),
+                )
+              ],
+            ),
             title: Text('Уведомления'),
           ),
           BottomNavigationBarItem(

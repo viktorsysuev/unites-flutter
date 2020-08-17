@@ -6,11 +6,12 @@ import 'package:unites_flutter/src/blocs/notification_bloc.dart';
 import 'package:unites_flutter/src/models/event_model.dart';
 import 'package:unites_flutter/src/models/notification_model.dart';
 import 'package:unites_flutter/src/models/notification_state.dart';
+import 'package:unites_flutter/src/ui/events/event_info_screen.dart';
+import 'package:unites_flutter/src/ui/profile/userInfo_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   @override
   _NotificationScreenState createState() => _NotificationScreenState();
-
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
@@ -20,6 +21,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void initState() {
     notificationBloc.getNotifications();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    notificationBloc.setNotificationsAsRead();
+    super.dispose();
   }
 
   @override
@@ -36,21 +43,60 @@ class _NotificationScreenState extends State<NotificationScreen> {
               Widget child;
               var bufferWidgets = <Widget>[];
               if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                snapshot.data.forEach((element) {
+                if (snapshot.data.firstWhere(
+                        (element) => element.seenByMe == false,
+                        orElse: () => null) !=
+                    null) {
                   bufferWidgets.add(Padding(
-                      padding: EdgeInsets.only(left: 6, right: 6, top: 4),
-                      child: Card(
-                          child: ListTile(
-                        onTap: () {
-//                              Navigator.push(
-//                                  context,
-//                                  MaterialPageRoute(
-//                                      builder: (context) =>
-//                                          EventInfoScreen(eventId: element.id)));
-                        },
-                        title: Text('${getNotificationText(element)}'),
-                      ))));
-                });
+                    padding:
+                        const EdgeInsets.only(left: 12.0, top: 12, bottom: 8),
+                    child: Text('Новые'),
+                  ));
+                  snapshot.data.forEach((element) {
+                    print('element ${element.seenByMe}');
+                    if (element.seenByMe == false) {
+                      bufferWidgets.add(Padding(
+                          padding: EdgeInsets.only(left: 6, right: 6, top: 4),
+                          child: Card(
+                              child: ListTile(
+                            onTap: () {
+                              navigateFromNotification(element, context);
+                            },
+                            title: Text('${getNotificationText(element)}'),
+                          ))));
+                    }
+                  });
+                  bufferWidgets.add(Padding(
+                    padding:
+                        const EdgeInsets.only(left: 12.0, top: 12, bottom: 8),
+                    child: Text('Просмотренные'),
+                  ));
+                  snapshot.data.forEach((element) {
+                    if (element.seenByMe == true) {
+                      bufferWidgets.add(Padding(
+                          padding: EdgeInsets.only(left: 6, right: 6, top: 4),
+                          child: Card(
+                              child: ListTile(
+                            onTap: () {
+                              navigateFromNotification(element, context);
+                            },
+                            title: Text('${getNotificationText(element)}'),
+                          ))));
+                    }
+                  });
+                } else {
+                  snapshot.data.forEach((element) {
+                    bufferWidgets.add(Padding(
+                        padding: EdgeInsets.only(left: 6, right: 6, top: 4),
+                        child: Card(
+                            child: ListTile(
+                          onTap: () {
+                            navigateFromNotification(element, context);
+                          },
+                          title: Text('${getNotificationText(element)}'),
+                        ))));
+                  });
+                }
 
                 child = Column(
                   children: bufferWidgets,
@@ -88,11 +134,35 @@ class _NotificationScreenState extends State<NotificationScreen> {
         NotificationState.EVENT_NEW_PARTICIPANT) {
       res =
           '${notificationModel.initiatorName} вступил в Ваше мероприятие `${notificationModel.eventName}`';
+    } else if (notificationModel.state ==
+        NotificationState.EVENT_LEFT_PARTICIPANT) {
+      res =
+          '${notificationModel.initiatorName} покинул Ваше мероприятие `${notificationModel.eventName}`';
     } else {
       res =
           '${notificationModel.initiatorName} прокомментировал ваше мероприятие `${notificationModel.eventName}`';
     }
 
     return res;
+  }
+
+
+  void navigateFromNotification(NotificationModel notification, BuildContext context){
+    if (notification.state ==
+        NotificationState.EVENT_CHANGED ||
+        notification.state ==
+            NotificationState.EVENT_NEW_COMMENT) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EventInfoScreen(
+                  eventId: notification.eventId)));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => UserInfoScreen(
+                  userId: notification.initiatorId)));
+    }
   }
 }
