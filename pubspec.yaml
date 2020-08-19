@@ -44,6 +44,8 @@ dependencies:
   shared_preferences: ^0.5.8
   get_it: ^4.0.4
   injectable: ^1.0.4
+  video_player: ^0.10.11+2
+  cached_network_image: ^2.2.0+1
 
 
   # Add the following three lines
@@ -74,6 +76,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/broke.svg
+    - assets/images/add.svg
     - assets/map_style/dark_map_style.json
     - assets/map_style/normal_map_style.json
   # To add assets to your application, add an assets section, like this:

@@ -11,6 +11,7 @@ import 'package:unites_flutter/src/models/event_with_members.dart';
 import 'package:unites_flutter/src/models/event_with_participants.dart';
 import 'package:unites_flutter/src/models/notification_model.dart';
 import 'package:unites_flutter/src/models/participants_model.dart';
+import 'package:unites_flutter/src/models/story_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 
 class DatabaseProvider {
@@ -123,6 +124,16 @@ class DatabaseProvider {
     return EventModel.fromDB(res[0]);
   }
 
+  Future<List<StoryModel>> getStories(String userId) async {
+    final db = await database;
+    var stories = <StoryModel>[];
+    var res = await db.rawQuery("SELECT * FROM stories WHERE userId = '$userId'");
+    res.forEach((element){
+      stories.add(StoryModel.fromDB(element));
+    });
+    return stories;
+  }
+
   Future<UserModel> getUser(String userId) async {
     final db = await database;
     var res = await db.rawQuery("SELECT * FROM users WHERE userId = '$userId'");
@@ -132,8 +143,17 @@ class DatabaseProvider {
   Future<List<UserModel>> getContacts(String userId) async {
     final db = await database;
     var contacts = <UserModel>{};
-    var res = await db.rawQuery(
-        "SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
+    var res = await db.rawQuery("SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
+    res.forEach((element) {
+      contacts.add(UserModel.fromJson(element));
+    });
+    return contacts.toList();
+  }
+
+  Future<List<UserModel>> getContactsWithStory() async {
+    final db = await database;
+    var contacts = <UserModel>{};
+    var res = await db.rawQuery('SELECT * FROM users WHERE userId in (SELECT userId FROM stories)');
     res.forEach((element) {
       contacts.add(UserModel.fromJson(element));
     });

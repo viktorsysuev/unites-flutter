@@ -4,8 +4,10 @@ import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
+import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:unites_flutter/src/ui/profile/edit_profile_screen.dart';
 import 'package:unites_flutter/src/ui/profile/userInfo_screen.dart';
+import 'package:unites_flutter/src/ui/stories/story_screen.dart';
 import 'package:unites_flutter/src/ui/widgets/little_widgets_collection.dart';
 
 class ContactsListScreen extends StatefulWidget {
@@ -16,10 +18,12 @@ class ContactsListScreen extends StatefulWidget {
 class _ContactsListScreenState extends State<ContactsListScreen> {
   final userBloc = getIt<UsersBloc>();
 
+  var userRepository = getIt<UserRepository>();
 
   @override
   void didChangeDependencies() {
     userBloc.fetchContacts();
+    userBloc.fetchContactsWithStory();
     super.didChangeDependencies();
   }
 
@@ -27,6 +31,177 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
   void dispose() {
     userBloc.dispose();
     super.dispose();
+  }
+
+  Widget buildStoriesList(List<UserModel> users) {
+    userBloc.fetchContactsWithStory();
+    return SizedBox.fromSize(
+        size: Size.fromHeight(110.0),
+        child: StreamBuilder<List<UserModel>>(
+            stream: userBloc.getContactsWithStory,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<UserModel>> snapshot) {
+              Widget child;
+              if (snapshot.hasData) {
+                var users = snapshot.data;
+                child = ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    itemCount: users.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      var user = index == 0
+                          ? userRepository.currentUser
+                          : users[index - 1];
+                      return index == 0
+                          ? Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 12.0, bottom: 8.0, right: 10.0),
+                              child: Stack(children: <Widget>[
+                                Container(
+                                    width: 90.0,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 1.0, vertical: 1.0),
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UserInfoScreen(
+                                                          userId:
+                                                              user.userId)));
+                                        },
+                                        child: Column(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 26,
+                                              backgroundColor:
+                                                  EditProfileScreen.colorById(
+                                                      user.userId),
+                                              child: ClipOval(
+                                                child: SizedBox(
+                                                  width: 300,
+                                                  height: 300,
+                                                  child: user.avatar != null
+                                                      ? Image.network(
+                                                          user.avatar,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Center(
+                                                          child: Text(
+                                                              '${user.firstName[0]}${user.lastName[0]}',
+                                                              style: TextStyle(
+                                                                  fontSize: 24,
+                                                                  color: Colors
+                                                                      .white),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center)),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 6.0),
+                                              child: Text('Ваша история',
+                                                  style: TextStyle(
+                                                      color: Colors.white70,
+                                                      fontSize: 13.0),
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            )
+                                          ],
+                                        ))),
+                                Positioned(
+                                    right: 15,
+                                    bottom: 32,
+                                    child: SvgPicture.asset(
+                                      'assets/images/add.svg',
+                                      width: 20,
+                                      height: 20,
+                                    )),
+                              ]),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, bottom: 8.0, right: 10.0),
+                              child: Container(
+                                  width: 60.0,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 1.0, vertical: 1.0),
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    StoryScreen(user: user)));
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                gradient: LinearGradient(
+                                                    begin: Alignment.topRight,
+                                                    end: Alignment.bottomLeft,
+                                                    colors: [
+                                                      Colors.pink,
+                                                      Colors.yellow
+                                                    ])),
+                                            child: CircleAvatar(
+                                              radius: 29,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: CircleAvatar(
+                                                radius: 26,
+                                                backgroundColor:
+                                                    EditProfileScreen.colorById(
+                                                        user.userId),
+                                                child: ClipOval(
+                                                  child: SizedBox(
+                                                    width: 300,
+                                                    height: 300,
+                                                    child: user.avatar != null
+                                                        ? Image.network(
+                                                            user.avatar,
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        : Center(
+                                                            child: Text(
+                                                                '${user.firstName[0]}${user.lastName[0]}',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        24,
+                                                                    color: Colors
+                                                                        .white),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 4.0),
+                                            child: Text('${user.firstName}',
+                                                style: TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 13.0),
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ],
+                                      ))),
+                            );
+                    });
+              } else {
+                child = Container();
+              }
+              return child;
+            }));
   }
 
   @override
@@ -45,6 +220,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
               Widget child;
               var bufferWidgets = <Widget>[];
               if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                bufferWidgets.add(buildStoriesList(snapshot.data));
                 snapshot.data.forEach((element) {
                   bufferWidgets.add(GestureDetector(
                       onTap: () => Navigator.push(
@@ -124,7 +300,8 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                   Text('В контактах пока никого нет',
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                       textAlign: TextAlign.center)
-                ]);;
+                ]);
+                ;
               }
               return child;
             },

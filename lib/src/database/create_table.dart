@@ -64,6 +64,17 @@ Map<String, String> createTables = {
 	      UNIQUE(notificationId)
 	      );""",
 
+  'stories': """CREATE TABLE stories (
+	      id INTEGER PRIMARY KEY AUTOINCREMENT,
+	      storyId TEXT,
+	      userId TEXT,
+	      url TEXT,
+	      mediaType TEXT,
+	      duration INTEGER,
+	      UNIQUE(storyId)
+	      );""",
+
+
   'comments_with_users': """
 	        CREATE VIEW comments_with_users
           AS

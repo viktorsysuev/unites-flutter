@@ -4,11 +4,12 @@ import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/src/database/database_provider.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 
-
+@singleton
 @injectable
 class UserRepository {
   final db = Firestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
+  UserModel currentUser;
 
   Future<bool> isUserExist() async {
     final user = await auth.currentUser();
@@ -44,6 +45,7 @@ class UserRepository {
 
   Future<String> getCurrentUserId() async {
     var user = await auth.currentUser();
+    currentUser = await getUser(user.uid);
     return user.uid;
   }
 
