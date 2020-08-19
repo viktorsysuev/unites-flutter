@@ -1,8 +1,16 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart';
 import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/event_bloc.dart';
+import 'package:unites_flutter/src/blocs/story_bloc.dart';
 import 'package:unites_flutter/src/blocs/user_bloc.dart';
+import 'package:unites_flutter/src/models/story_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:unites_flutter/src/ui/profile/edit_profile_screen.dart';
@@ -17,6 +25,7 @@ class ContactsListScreen extends StatefulWidget {
 
 class _ContactsListScreenState extends State<ContactsListScreen> {
   final userBloc = getIt<UsersBloc>();
+  final storyBloc = StoryBloc();
 
   var userRepository = getIt<UserRepository>();
 
@@ -47,12 +56,12 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 child = ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    itemCount: users.length + 1,
+                    itemCount: snapshot.data.contains(userRepository.currentUser) ? users.length : users.length + 1,
                     itemBuilder: (BuildContext context, int index) {
                       var user = index == 0
                           ? userRepository.currentUser
                           : users[index - 1];
-                      return index == 0
+                      return index == 0 && !snapshot.data.contains(user)
                           ? Padding(
                               padding: const EdgeInsets.only(
                                   top: 12.0, bottom: 8.0, right: 10.0),
@@ -63,13 +72,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                         horizontal: 1.0, vertical: 1.0),
                                     child: GestureDetector(
                                         onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UserInfoScreen(
-                                                          userId:
-                                                              user.userId)));
+                                          pickFile();
                                         },
                                         child: Column(
                                           children: [
@@ -308,5 +311,30 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
           ),
         ));
     ;
+  }
+
+  Future pickFile() async {
+    var file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
+    var firebaseStorage = FirebaseStorage.instance.ref().child(basename(file.path));
+    var metadata = StorageMetadata(contentType: lookupMimeType(file.path));
+    var task = await firebaseStorage.putFile(file, metadata);
+    await task.onComplete;
+    var url = await firebaseStorage.getDownloadURL();
+    var story = StoryModel();
+    story.userId = userRepository.currentUser.userId;
+    story.url = url;
+    story.mediaType = getMediaType(file.path);
+    storyBloc.createStory(story);
+    print('url $url');
+  }
+
+  MediaType getMediaType(String path) {
+    var type = lookupMimeType(path);
+    print('type ${type}');
+    if (type.split('/')[0] == 'image') {
+      return MediaType.IMAGE;
+    } else {
+      return MediaType.VIDEO;
+    }
   }
 }

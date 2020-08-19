@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unites_flutter/src/models/participants_model.dart';
 
 class EventModel {
   String id;

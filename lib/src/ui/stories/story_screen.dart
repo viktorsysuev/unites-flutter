@@ -1,9 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as Path;
+import 'package:unites_flutter/main.dart';
 import 'package:unites_flutter/src/blocs/story_bloc.dart';
 import 'package:unites_flutter/src/models/story_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
+import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:video_player/video_player.dart';
 
 class StoryScreen extends StatefulWidget {
@@ -44,10 +49,9 @@ class _StoryScreenState extends State<StoryScreen>
             currentIndex += 1;
             loadStory(story: stories[currentIndex]);
           } else {
-            // Out of bounds - loop story
-            // You can also Navigator.of(context).pop() here
-            currentIndex = 0;
-            loadStory(story: stories[currentIndex]);
+//            currentIndex = 0;
+//            loadStory(story: stories[currentIndex]);
+            Navigator.of(context).pop();
           }
         });
         if (videoPlayerController != null) {
@@ -165,18 +169,19 @@ class _StoryScreenState extends State<StoryScreen>
           currentIndex += 1;
           loadStory(story: stories[currentIndex]);
         } else {
-          currentIndex = 0;
-          loadStory(story: stories[currentIndex]);
+          Navigator.of(context).pop();
+//          currentIndex = 0;
+//          loadStory(story: stories[currentIndex]);
         }
       });
     } else {
-        if (videoPlayerController.value.isPlaying) {
-          videoPlayerController.pause();
-          animController.stop();
-        } else {
-          videoPlayerController.play();
-          animController.forward();
-        }
+      if (videoPlayerController.value.isPlaying) {
+        videoPlayerController.pause();
+        animController.stop();
+      } else {
+        videoPlayerController.play();
+        animController.forward();
+      }
     }
   }
 
@@ -277,42 +282,112 @@ class AnimatedBar extends StatelessWidget {
 class UserInfo extends StatelessWidget {
   final UserModel user;
 
-  const UserInfo({
+  UserInfo({
     Key key,
     @required this.user,
   }) : super(key: key);
 
+//
+  final userRepository = getIt<UserRepository>();
+  final storyBloc = StoryBloc();
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        CircleAvatar(
-          radius: 20.0,
-          backgroundColor: Colors.grey[300],
-          backgroundImage: CachedNetworkImageProvider(
-            user.avatar,
-          ),
-        ),
-        const SizedBox(width: 10.0),
-        Expanded(
-          child: Text(
-            user.firstName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
+    return Column(
+      children: [
+        Row(
+          children: <Widget>[
+            CircleAvatar(
+              radius: 20.0,
+              backgroundColor: Colors.grey[300],
+              backgroundImage: CachedNetworkImageProvider(
+                user.avatar,
+              ),
             ),
-          ),
+            const SizedBox(width: 10.0),
+            Expanded(
+              child: Text(
+                user.firstName,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.close,
+                size: 30.0,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
         ),
-        IconButton(
-          icon: const Icon(
-            Icons.close,
-            size: 30.0,
-            color: Colors.white,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        userRepository.currentUser.userId == user.userId
+            ? GestureDetector(
+                onTap: pickFile,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 170,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topRight,
+                            end: Alignment.bottomLeft,
+                            colors: [Colors.pinkAccent, Colors.orangeAccent]),
+                        shape: BoxShape.rectangle,
+                        color: Colors.orangeAccent,
+                        borderRadius: BorderRadius.circular(16.0)),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 4.0, top: 4.0, bottom: 4.0),
+                          child: Icon(Icons.add),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Text('Добавить историю',
+                              textAlign: TextAlign.left),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            : Container()
       ],
     );
+  }
+
+  Future pickFile() async {
+    var file = await FilePicker.getFile(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
+
+    var metadata = StorageMetadata(contentType: lookupMimeType(file.path));
+    var firebaseStorage =
+        FirebaseStorage.instance.ref().child(Path.basename(file.path));
+    var task = await firebaseStorage.putFile(file, metadata);
+    await task.onComplete;
+    var url = await firebaseStorage.getDownloadURL();
+    var story = StoryModel();
+    story.userId = userRepository.currentUser.userId;
+    story.url = url;
+    story.mediaType = getMediaType(file.path);
+    storyBloc.createStory(story);
+    print('url $url');
+  }
+
+  MediaType getMediaType(String path) {
+    var type = lookupMimeType(path);
+    print('type ${type}');
+    if (type.split('/')[0] == 'image') {
+      return MediaType.IMAGE;
+    } else {
+      return MediaType.VIDEO;
+    }
   }
 }

@@ -24,4 +24,17 @@ class StoryRepository {
     return DatabaseProvider.db.getStories(userId);
   }
 
+  void createStory(StoryModel story) async {
+    var userId = userRepository.currentUser.userId;
+    await db
+        .collection('users')
+        .document(userId)
+        .collection('stories')
+        .add(story.toJson())
+        .then((value) => {
+              story.storyId = value.documentID,
+              value.updateData(story.toJson()),
+              DatabaseProvider.db.insertData('stories', story.toMap())
+            });
+  }
 }

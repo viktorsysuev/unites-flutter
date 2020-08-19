@@ -46,7 +46,8 @@ dependencies:
   injectable: ^1.0.4
   video_player: ^0.10.11+2
   cached_network_image: ^2.2.0+1
-
+  file_picker: ^1.13.3
+  mime: ^0.9.7
 
   # Add the following three lines
 

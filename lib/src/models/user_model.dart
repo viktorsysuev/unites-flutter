@@ -24,12 +24,18 @@ class UserModel {
       });
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) =>
-      _UserModellFromJson(json);
+      _UserModelFromJson(json);
 
   Map<String, dynamic> toJson() => _UserModelToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    var user = other as UserModel;
+    return user.userId == userId;
+  }
 }
 
-UserModel _UserModellFromJson(Map<dynamic, dynamic> json) {
+UserModel _UserModelFromJson(Map<dynamic, dynamic> json) {
   return UserModel(
     userId: json['userId'] as String,
     firstName: json['firstName'] as String,
