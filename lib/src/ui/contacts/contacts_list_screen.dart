@@ -15,6 +15,7 @@ import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
 import 'package:unites_flutter/src/ui/profile/edit_profile_screen.dart';
 import 'package:unites_flutter/src/ui/profile/userInfo_screen.dart';
+import 'package:unites_flutter/src/ui/stories/create_story_screen.dart';
 import 'package:unites_flutter/src/ui/stories/story_screen.dart';
 import 'package:unites_flutter/src/ui/widgets/little_widgets_collection.dart';
 
@@ -56,7 +57,10 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 child = ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    itemCount: snapshot.data.contains(userRepository.currentUser) ? users.length : users.length + 1,
+                    itemCount:
+                        snapshot.data.contains(userRepository.currentUser)
+                            ? users.length
+                            : users.length + 1,
                     itemBuilder: (BuildContext context, int index) {
                       var user = index == 0
                           ? userRepository.currentUser
@@ -72,7 +76,10 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                         horizontal: 1.0, vertical: 1.0),
                                     child: GestureDetector(
                                         onTap: () {
-                                          pickFile();
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CreateStoryScreen()));
                                         },
                                         child: Column(
                                           children: [
@@ -311,30 +318,5 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
           ),
         ));
     ;
-  }
-
-  Future pickFile() async {
-    var file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
-    var firebaseStorage = FirebaseStorage.instance.ref().child(basename(file.path));
-    var metadata = StorageMetadata(contentType: lookupMimeType(file.path));
-    var task = await firebaseStorage.putFile(file, metadata);
-    await task.onComplete;
-    var url = await firebaseStorage.getDownloadURL();
-    var story = StoryModel();
-    story.userId = userRepository.currentUser.userId;
-    story.url = url;
-    story.mediaType = getMediaType(file.path);
-    storyBloc.createStory(story);
-    print('url $url');
-  }
-
-  MediaType getMediaType(String path) {
-    var type = lookupMimeType(path);
-    print('type ${type}');
-    if (type.split('/')[0] == 'image') {
-      return MediaType.IMAGE;
-    } else {
-      return MediaType.VIDEO;
-    }
   }
 }

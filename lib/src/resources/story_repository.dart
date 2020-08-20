@@ -34,6 +34,7 @@ class StoryRepository {
         .then((value) => {
               story.storyId = value.documentID,
               value.updateData(story.toJson()),
+              print('story insert in db ${story.storyId}'),
               DatabaseProvider.db.insertData('stories', story.toMap())
             });
   }

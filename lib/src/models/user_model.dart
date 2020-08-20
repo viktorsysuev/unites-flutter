@@ -20,8 +20,7 @@ class UserModel {
       this.company,
       this.token,
       this.aboutMe,
-      this.avatar
-      });
+      this.avatar});
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) =>
       _UserModelFromJson(json);
@@ -31,7 +30,7 @@ class UserModel {
   @override
   bool operator ==(Object other) {
     var user = other as UserModel;
-    return user.userId == userId;
+    return user == null ? false : user.userId == userId;
   }
 }
 
@@ -61,4 +60,4 @@ Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{
       'token': instance.token,
       'aboutMe': instance.aboutMe,
       'avatar': instance.avatar,
-};
+    };

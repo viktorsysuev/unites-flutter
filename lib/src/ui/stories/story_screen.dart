@@ -9,6 +9,7 @@ import 'package:unites_flutter/src/blocs/story_bloc.dart';
 import 'package:unites_flutter/src/models/story_model.dart';
 import 'package:unites_flutter/src/models/user_model.dart';
 import 'package:unites_flutter/src/resources/user_repository.dart';
+import 'package:unites_flutter/src/ui/stories/create_story_screen.dart';
 import 'package:video_player/video_player.dart';
 
 class StoryScreen extends StatefulWidget {
@@ -65,6 +66,7 @@ class _StoryScreenState extends State<StoryScreen>
 
   @override
   void dispose() {
+    animController.removeListener(() {});
     pageController.dispose();
     animController.dispose();
     videoPlayerController?.dispose();
@@ -327,7 +329,10 @@ class UserInfo extends StatelessWidget {
         ),
         userRepository.currentUser.userId == user.userId
             ? GestureDetector(
-                onTap: pickFile,
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CreateStoryScreen()));
+                },
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
@@ -360,34 +365,5 @@ class UserInfo extends StatelessWidget {
             : Container()
       ],
     );
-  }
-
-  Future pickFile() async {
-    var file = await FilePicker.getFile(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
-
-    var metadata = StorageMetadata(contentType: lookupMimeType(file.path));
-    var firebaseStorage =
-        FirebaseStorage.instance.ref().child(Path.basename(file.path));
-    var task = await firebaseStorage.putFile(file, metadata);
-    await task.onComplete;
-    var url = await firebaseStorage.getDownloadURL();
-    var story = StoryModel();
-    story.userId = userRepository.currentUser.userId;
-    story.url = url;
-    story.mediaType = getMediaType(file.path);
-    storyBloc.createStory(story);
-    print('url $url');
-  }
-
-  MediaType getMediaType(String path) {
-    var type = lookupMimeType(path);
-    print('type ${type}');
-    if (type.split('/')[0] == 'image') {
-      return MediaType.IMAGE;
-    } else {
-      return MediaType.VIDEO;
-    }
   }
 }

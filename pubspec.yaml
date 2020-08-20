@@ -48,7 +48,8 @@ dependencies:
   cached_network_image: ^2.2.0+1
   file_picker: ^1.13.3
   mime: ^0.9.7
-
+  camera: ^0.5.8+5
+  thumbnails: ^1.0.1
   # Add the following three lines
 
 
