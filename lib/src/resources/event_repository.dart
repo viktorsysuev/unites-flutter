@@ -160,8 +160,12 @@ class EventRepository {
   }
 
   Future<List<EventWithParticipants>> getMyEvents() async {
-    var currentUserId = await userRepository.getCurrentUserId();
-    var events = await DatabaseProvider.db.getMyEvents(currentUserId);
+    var currentUserId;
+    var events = <EventWithParticipants>[];
+    if(userRepository.currentUser != null){
+      currentUserId = userRepository.currentUser.userId;
+      events = await DatabaseProvider.db.getMyEvents(currentUserId);
+    }
     return events;
   }
 

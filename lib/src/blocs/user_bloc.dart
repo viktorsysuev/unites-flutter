@@ -46,8 +46,12 @@ class UsersBloc {
   }
 
   fetchContacts() async {
-    var userId = userRepository.currentUser.userId;
-    var contacts = await DatabaseProvider.db.getContacts(userId);
+    var currentUserId;
+    var contacts = <UserModel>[];
+    if(userRepository.currentUser != null){
+      currentUserId = userRepository.currentUser.userId;
+      contacts = await DatabaseProvider.db.getContacts(currentUserId);
+    }
     _contactsFetcher.sink.add(contacts);
   }
 

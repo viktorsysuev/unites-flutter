@@ -190,6 +190,9 @@ class _StoryScreenState extends State<StoryScreen>
   void loadStory({StoryModel story, bool animateToPage = true}) {
     animController.stop();
     animController.reset();
+    if(videoPlayerController != null){
+      videoPlayerController.pause();
+    }
     switch (story.mediaType) {
       case MediaType.IMAGE:
         animController.duration = Duration(seconds: 5);
