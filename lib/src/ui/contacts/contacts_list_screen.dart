@@ -29,6 +29,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
   final storyBloc = StoryBloc();
 
   var userRepository = getIt<UserRepository>();
+  var usersToSend = <UserModel>[];
 
   @override
   void didChangeDependencies() {
@@ -53,18 +54,19 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 AsyncSnapshot<List<UserModel>> snapshot) {
               Widget child;
               if (snapshot.hasData) {
-                var users = snapshot.data;
+                var users = List.of(snapshot.data);
+                if (snapshot.data.contains(userRepository.currentUser)) {
+                  users.remove(userRepository.currentUser);
+                }
                 child = ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    itemCount:
-                        snapshot.data.contains(userRepository.currentUser)
-                            ? users.length
-                            : users.length + 1,
+                    itemCount: users.length + 1,
                     itemBuilder: (BuildContext context, int index) {
                       var user = index == 0
                           ? userRepository.currentUser
                           : users[index - 1];
+                      usersToSend.add(user);
                       return index == 0 && !snapshot.data.contains(user)
                           ? Padding(
                               padding: const EdgeInsets.only(
@@ -145,7 +147,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    StoryScreen(user: user)));
+                                                    StoryScreen(user: user, users: usersToSend)));
                                       },
                                       child: Column(
                                         children: [

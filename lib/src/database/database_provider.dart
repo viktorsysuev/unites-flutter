@@ -127,7 +127,7 @@ class DatabaseProvider {
   Future<List<StoryModel>> getStories(String userId) async {
     final db = await database;
     var stories = <StoryModel>[];
-    var res = await db.rawQuery("SELECT * FROM stories WHERE userId = '$userId'");
+    var res = await db.rawQuery("SELECT * FROM stories");
     res.forEach((element){
       stories.add(StoryModel.fromDB(element));
     });

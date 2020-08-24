@@ -15,7 +15,9 @@ import 'package:video_player/video_player.dart';
 class StoryScreen extends StatefulWidget {
   UserModel user;
 
-  StoryScreen({@required this.user});
+  List<UserModel> users;
+
+  StoryScreen({@required this.user, this.users});
 
   @override
   _StoryScreenState createState() => _StoryScreenState();
@@ -25,18 +27,29 @@ class _StoryScreenState extends State<StoryScreen>
     with SingleTickerProviderStateMixin {
   var storyBloc = StoryBloc();
   PageController pageController;
+  PageController globalPageController;
   VideoPlayerController videoPlayerController;
   AnimationController animController;
 
   var stories = <StoryModel>[];
 
   int currentIndex = 0;
+  int currentGlobalIndex = 0;
+  int curPage = 0;
 
   @override
   void initState() {
+    widget.users.reversed;
+    currentGlobalIndex = widget.users.indexOf(widget.user);
     storyBloc.fetchStories(widget.user.userId);
     pageController = PageController();
+    globalPageController = PageController(initialPage: currentGlobalIndex);
     animController = AnimationController(vsync: this);
+    curPage = currentGlobalIndex;
+
+    if (globalPageController.hasClients) {
+      globalPageController.jumpToPage(currentGlobalIndex);
+    }
 
     storyBloc.getStories.listen((event) {
       loadStory(story: event[0], animateToPage: false);
@@ -59,6 +72,18 @@ class _StoryScreenState extends State<StoryScreen>
           videoPlayerController.play();
         }
       }
+
+      globalPageController.addListener(() {
+        if (curPage != globalPageController.page.toInt()) {
+          curPage = globalPageController.page.toInt();
+          setState(() {
+            widget.user = widget.users[currentGlobalIndex];
+            currentIndex = 0;
+            currentGlobalIndex = globalPageController.page.toInt();
+            storyBloc.fetchStories(widget.users[currentGlobalIndex].userId);
+          });
+        }
+      });
     });
 
     super.initState();
@@ -82,71 +107,88 @@ class _StoryScreenState extends State<StoryScreen>
                 AsyncSnapshot<List<StoryModel>> snapshot) {
               Widget child;
               if (snapshot.hasData) {
-                stories = snapshot.data;
-                child = GestureDetector(
-                  onTapDown: (details) =>
-                      _onTapDown(details, stories[currentIndex]),
-                  child: Stack(children: [
-                    PageView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data.length,
-                        controller: pageController,
-                        itemBuilder: (context, i) {
-                          final story = snapshot.data[i];
-                          switch (story.mediaType) {
-                            case MediaType.IMAGE:
-                              return CachedNetworkImage(
-                                imageUrl: story.url,
-                                fit: BoxFit.cover,
-                              );
-                            case MediaType.VIDEO:
-                              if (videoPlayerController != null &&
-                                  videoPlayerController.value.initialized) {
-                                return FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: SizedBox(
-                                    width:
-                                        videoPlayerController.value.size.width,
-                                    height:
-                                        videoPlayerController.value.size.height,
-                                    child: VideoPlayer(videoPlayerController),
+                stories = snapshot.data
+                    .where((element) =>
+                        element.userId ==
+                        widget.users[currentGlobalIndex].userId)
+                    .toList();
+                child = PageView.builder(
+                    itemCount: widget.users.length,
+                    controller: globalPageController,
+                    itemBuilder: (context, userIndex) {
+                      var currentUserStories = snapshot.data
+                          .where(
+                              (e) => e.userId == widget.users[userIndex].userId)
+                          .toList();
+                      stories = currentUserStories;
+                      return GestureDetector(
+                        onTapDown: (details) => _onTapDown(
+                            details, currentUserStories[currentIndex]),
+                        child: Stack(children: [
+                          PageView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: currentUserStories.length,
+                              controller: pageController,
+                              itemBuilder: (context, i) {
+                                final story = currentUserStories[i];
+                                switch (story.mediaType) {
+                                  case MediaType.IMAGE:
+                                    return CachedNetworkImage(
+                                      imageUrl: story.url,
+                                      fit: BoxFit.cover,
+                                    );
+                                  case MediaType.VIDEO:
+                                    if (videoPlayerController != null &&
+                                        videoPlayerController
+                                            .value.initialized) {
+                                      return FittedBox(
+                                        fit: BoxFit.contain,
+                                        child: SizedBox(
+                                          width: videoPlayerController
+                                              .value.size.width,
+                                          height: videoPlayerController
+                                              .value.size.height,
+                                          child: VideoPlayer(
+                                              videoPlayerController),
+                                        ),
+                                      );
+                                    }
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                          Positioned(
+                              top: 40.0,
+                              left: 10.0,
+                              right: 10.0,
+                              child: Column(children: <Widget>[
+                                Row(
+                                  children: currentUserStories
+                                      .asMap()
+                                      .map((i, e) {
+                                        return MapEntry(
+                                          i,
+                                          AnimatedBar(
+                                            animController: animController,
+                                            position: i,
+                                            currentIndex: currentIndex,
+                                          ),
+                                        );
+                                      })
+                                      .values
+                                      .toList(),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 1.5,
+                                    vertical: 10.0,
                                   ),
-                                );
-                              }
-                          }
-                          return const SizedBox.shrink();
-                        }),
-                    Positioned(
-                        top: 40.0,
-                        left: 10.0,
-                        right: 10.0,
-                        child: Column(children: <Widget>[
-                          Row(
-                            children: snapshot.data
-                                .asMap()
-                                .map((i, e) {
-                                  return MapEntry(
-                                    i,
-                                    AnimatedBar(
-                                      animController: animController,
-                                      position: i,
-                                      currentIndex: currentIndex,
-                                    ),
-                                  );
-                                })
-                                .values
-                                .toList(),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 1.5,
-                              vertical: 10.0,
-                            ),
-                            child: UserInfo(user: widget.user),
-                          ),
-                        ]))
-                  ]),
-                );
+                                  child:
+                                      UserInfo(user: widget.users[userIndex]),
+                                ),
+                              ]))
+                        ]),
+                      );
+                    });
               } else {
                 child = Container();
               }
@@ -190,7 +232,7 @@ class _StoryScreenState extends State<StoryScreen>
   void loadStory({StoryModel story, bool animateToPage = true}) {
     animController.stop();
     animController.reset();
-    if(videoPlayerController != null){
+    if (videoPlayerController != null) {
       videoPlayerController.pause();
     }
     switch (story.mediaType) {
