@@ -32,10 +32,12 @@ class _StoryScreenState extends State<StoryScreen>
   AnimationController animController;
 
   var stories = <StoryModel>[];
+  var allStories = <StoryModel>[];
 
   int currentIndex = 0;
   int currentGlobalIndex = 0;
   int curPage = 0;
+  var currentPageValue = 1.0;
 
   @override
   void initState() {
@@ -47,8 +49,8 @@ class _StoryScreenState extends State<StoryScreen>
     animController = AnimationController(vsync: this);
     curPage = currentGlobalIndex;
 
-    if (globalPageController.hasClients) {
-      globalPageController.jumpToPage(currentGlobalIndex);
+    if(currentGlobalIndex == widget.users.length - 1){
+      currentPageValue = 0;
     }
 
     storyBloc.getStories.listen((event) {
@@ -74,13 +76,25 @@ class _StoryScreenState extends State<StoryScreen>
       }
 
       globalPageController.addListener(() {
-        if (curPage != globalPageController.page.toInt()) {
-          curPage = globalPageController.page.toInt();
+//        print('globalPageController.page ${globalPageController.page}, currentGlobalIndex.toDouble() equal ${globalPageController.page == currentGlobalIndex.toDouble()}');
+        if(globalPageController.page == currentGlobalIndex.toDouble()){
+          animController.forward();
+          videoPlayerController?.play();
+        } else {
+          animController.stop();
+          videoPlayerController?.pause();
+        }
+        setState(() {
+          currentPageValue = globalPageController.page;
+        });
+        if (curPage != globalPageController.page.floor()) {
+          curPage = globalPageController.page.floor();
           setState(() {
-            widget.user = widget.users[currentGlobalIndex];
+            currentGlobalIndex = globalPageController.page.floor();
             currentIndex = 0;
-            currentGlobalIndex = globalPageController.page.toInt();
-            storyBloc.fetchStories(widget.users[currentGlobalIndex].userId);
+            stories = allStories.where((element) => element.userId == widget.users[currentGlobalIndex].userId).toList();
+//            widget.user = widget.users[currentGlobalIndex];
+            loadStory(story: stories[currentIndex]);
           });
         }
       });
@@ -101,103 +115,61 @@ class _StoryScreenState extends State<StoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder<List<StoryModel>>(
-            stream: storyBloc.getStories,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<StoryModel>> snapshot) {
-              Widget child;
-              if (snapshot.hasData) {
-                stories = snapshot.data
-                    .where((element) =>
-                        element.userId ==
-                        widget.users[currentGlobalIndex].userId)
-                    .toList();
-                child = PageView.builder(
-                    itemCount: widget.users.length,
-                    controller: globalPageController,
-                    itemBuilder: (context, userIndex) {
-                      var currentUserStories = snapshot.data
-                          .where(
-                              (e) => e.userId == widget.users[userIndex].userId)
-                          .toList();
-                      stories = currentUserStories;
-                      return GestureDetector(
-                        onTapDown: (details) => _onTapDown(
-                            details, currentUserStories[currentIndex]),
-                        child: Stack(children: [
-                          PageView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: currentUserStories.length,
-                              controller: pageController,
-                              itemBuilder: (context, i) {
-                                final story = currentUserStories[i];
-                                switch (story.mediaType) {
-                                  case MediaType.IMAGE:
-                                    return CachedNetworkImage(
-                                      imageUrl: story.url,
-                                      fit: BoxFit.cover,
-                                    );
-                                  case MediaType.VIDEO:
-                                    if (videoPlayerController != null &&
-                                        videoPlayerController
-                                            .value.initialized) {
-                                      return FittedBox(
-                                        fit: BoxFit.contain,
-                                        child: SizedBox(
-                                          width: videoPlayerController
-                                              .value.size.width,
-                                          height: videoPlayerController
-                                              .value.size.height,
-                                          child: VideoPlayer(
-                                              videoPlayerController),
-                                        ),
-                                      );
-                                    }
-                                }
-                                return const SizedBox.shrink();
-                              }),
-                          Positioned(
-                              top: 40.0,
-                              left: 10.0,
-                              right: 10.0,
-                              child: Column(children: <Widget>[
-                                Row(
-                                  children: currentUserStories
-                                      .asMap()
-                                      .map((i, e) {
-                                        return MapEntry(
-                                          i,
-                                          AnimatedBar(
-                                            animController: animController,
-                                            position: i,
-                                            currentIndex: currentIndex,
-                                          ),
-                                        );
-                                      })
-                                      .values
-                                      .toList(),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 1.5,
-                                    vertical: 10.0,
-                                  ),
-                                  child:
-                                      UserInfo(user: widget.users[userIndex]),
-                                ),
-                              ]))
-                        ]),
-                      );
-                    });
-              } else {
-                child = Container();
-              }
+        body: Dismissible(
+          direction: DismissDirection.vertical,
+          key: Key('key'),
+          onDismissed: (_) => Navigator.of(context).pop(),
+          child: StreamBuilder<List<StoryModel>>(
+              stream: storyBloc.getStories,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<StoryModel>> snapshot) {
+                Widget child;
+                if (snapshot.hasData) {
+                  allStories = snapshot.data;
+                  stories = snapshot.data
+                      .where((element) =>
+                          element.userId ==
+                          widget.users[currentGlobalIndex].userId)
+                      .toList();
+                  child = PageView.builder(
+                      itemCount: widget.users.length,
+                      controller: globalPageController,
+                      itemBuilder: (context, userIndex) {
+                        var currentUserStories = snapshot.data
+                            .where(
+                                (e) => e.userId == widget.users[userIndex].userId)
+                            .toList();
+                        stories = currentUserStories;
+                        if (userIndex == currentPageValue.floor()) {
+                          return Transform(
+                            transform: Matrix4.identity()
+                              ..rotateX(currentPageValue - userIndex),
+                            child: Container(
+                              child: storyWidget(currentUserStories, userIndex),
+                            ),
+                          );
+                        } else if (userIndex == currentPageValue.floor() + 1) {
+                          return Transform(
+                            transform: Matrix4.identity()
+                              ..rotateX(currentPageValue - userIndex),
+                            child: Container(
+                                child: storyWidget(currentUserStories, userIndex)),
+                          );
+                        }
+                        else {
+                          return storyWidget(currentUserStories, userIndex);
+                        }
+                      });
+                } else {
+                  child = Container();
+                }
 
-              return child;
-            }));
+                return child;
+              }),
+        ));
   }
 
-  void _onTapDown(TapDownDetails details, StoryModel story) {
+  void _onTapUp(TapUpDetails details, List<StoryModel> stories) {
     final screenWidth = MediaQuery.of(context).size.width;
     final dx = details.globalPosition.dx;
     if (dx < screenWidth / 3) {
@@ -208,12 +180,24 @@ class _StoryScreenState extends State<StoryScreen>
         }
       });
     } else if (dx > 2 * screenWidth / 3) {
+      print('currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex size ${stories.length}');
       setState(() {
         if (currentIndex + 1 < stories.length) {
           currentIndex += 1;
           loadStory(story: stories[currentIndex]);
         } else {
-          Navigator.of(context).pop();
+          if (currentGlobalIndex < widget.users.length - 1) {
+//            animController.stop();
+//            animController.reset();
+            currentIndex = 0;
+            currentGlobalIndex += 1;
+            stories = allStories.where((element) => element.userId == widget.users[currentGlobalIndex].userId).toList();
+            print('currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex');
+            globalPageController.animateToPage(currentGlobalIndex, duration: Duration(seconds: 1), curve: Curves.ease);
+            loadStory(story: stories[currentIndex]);
+          } else {
+            Navigator.of(context).pop();
+          }
 //          currentIndex = 0;
 //          loadStory(story: stories[currentIndex]);
         }
@@ -230,6 +214,7 @@ class _StoryScreenState extends State<StoryScreen>
   }
 
   void loadStory({StoryModel story, bool animateToPage = true}) {
+    print('load story ${story.url}');
     animController.stop();
     animController.reset();
     if (videoPlayerController != null) {
@@ -241,8 +226,9 @@ class _StoryScreenState extends State<StoryScreen>
         animController.forward();
         break;
       case MediaType.VIDEO:
-        videoPlayerController = null;
         videoPlayerController?.dispose();
+        videoPlayerController = null;
+        print('video story ${story.url}');
         videoPlayerController = VideoPlayerController.network(story.url)
           ..initialize().then((_) {
             setState(() {});
@@ -261,6 +247,74 @@ class _StoryScreenState extends State<StoryScreen>
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  Widget storyWidget(List<StoryModel> currentUserStories, int userIndex) {
+    return GestureDetector(
+      onTapUp: (details) =>
+          _onTapUp(details, currentUserStories),
+      child: Stack(children: [
+        PageView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: currentUserStories.length,
+            controller: pageController,
+            itemBuilder: (context, i) {
+              final story = currentUserStories[i];
+              switch (story.mediaType) {
+                case MediaType.IMAGE:
+                  return CachedNetworkImage(
+                    imageUrl: story.url,
+                    fit: BoxFit.cover,
+                  );
+                case MediaType.VIDEO:
+                  if (videoPlayerController != null &&
+                      videoPlayerController.value.initialized) {
+                    return Container(
+                      height: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: SizedBox(
+                          width: videoPlayerController.value.size.width,
+                          height: videoPlayerController.value.size.height,
+                          child: VideoPlayer(videoPlayerController),
+                        ),
+                      ),
+                    );
+                  }
+              }
+              return const SizedBox.shrink();
+            }),
+        Positioned(
+            top: 40.0,
+            left: 10.0,
+            right: 10.0,
+            child: Column(children: <Widget>[
+              Row(
+                children: currentUserStories
+                    .asMap()
+                    .map((i, e) {
+                      return MapEntry(
+                        i,
+                        AnimatedBar(
+                          animController: animController,
+                          position: i,
+                          currentIndex: currentIndex,
+                        ),
+                      );
+                    })
+                    .values
+                    .toList(),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 1.5,
+                  vertical: 10.0,
+                ),
+                child: UserInfo(user: widget.users[userIndex]),
+              ),
+            ]))
+      ]),
+    );
   }
 }
 
