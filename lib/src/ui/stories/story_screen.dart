@@ -49,7 +49,7 @@ class _StoryScreenState extends State<StoryScreen>
     animController = AnimationController(vsync: this);
     curPage = currentGlobalIndex;
 
-    if(currentGlobalIndex == widget.users.length - 1){
+    if (currentGlobalIndex == widget.users.length - 1) {
       currentPageValue = 0;
     }
 
@@ -77,7 +77,7 @@ class _StoryScreenState extends State<StoryScreen>
 
       globalPageController.addListener(() {
 //        print('globalPageController.page ${globalPageController.page}, currentGlobalIndex.toDouble() equal ${globalPageController.page == currentGlobalIndex.toDouble()}');
-        if(globalPageController.page == currentGlobalIndex.toDouble()){
+        if (globalPageController.page == currentGlobalIndex.toDouble()) {
           animController.forward();
           videoPlayerController?.play();
         } else {
@@ -92,9 +92,12 @@ class _StoryScreenState extends State<StoryScreen>
           setState(() {
             currentGlobalIndex = globalPageController.page.floor();
             currentIndex = 0;
-            stories = allStories.where((element) => element.userId == widget.users[currentGlobalIndex].userId).toList();
+            stories = allStories
+                .where((element) =>
+                    element.userId == widget.users[currentGlobalIndex].userId)
+                .toList();
 //            widget.user = widget.users[currentGlobalIndex];
-            loadStory(story: stories[currentIndex]);
+            loadStory(story: stories[currentIndex], animateToPage: false);
           });
         }
       });
@@ -116,57 +119,55 @@ class _StoryScreenState extends State<StoryScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         body: Dismissible(
-          direction: DismissDirection.vertical,
-          key: Key('key'),
-          onDismissed: (_) => Navigator.of(context).pop(),
-          child: StreamBuilder<List<StoryModel>>(
-              stream: storyBloc.getStories,
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<StoryModel>> snapshot) {
-                Widget child;
-                if (snapshot.hasData) {
-                  allStories = snapshot.data;
-                  stories = snapshot.data
-                      .where((element) =>
-                          element.userId ==
-                          widget.users[currentGlobalIndex].userId)
-                      .toList();
-                  child = PageView.builder(
-                      itemCount: widget.users.length,
-                      controller: globalPageController,
-                      itemBuilder: (context, userIndex) {
-                        var currentUserStories = snapshot.data
-                            .where(
-                                (e) => e.userId == widget.users[userIndex].userId)
-                            .toList();
-                        stories = currentUserStories;
-                        if (userIndex == currentPageValue.floor()) {
-                          return Transform(
-                            transform: Matrix4.identity()
-                              ..rotateX(currentPageValue - userIndex),
-                            child: Container(
-                              child: storyWidget(currentUserStories, userIndex),
-                            ),
-                          );
-                        } else if (userIndex == currentPageValue.floor() + 1) {
-                          return Transform(
-                            transform: Matrix4.identity()
-                              ..rotateX(currentPageValue - userIndex),
-                            child: Container(
-                                child: storyWidget(currentUserStories, userIndex)),
-                          );
-                        }
-                        else {
-                          return storyWidget(currentUserStories, userIndex);
-                        }
-                      });
-                } else {
-                  child = Container();
-                }
+      direction: DismissDirection.vertical,
+      key: Key('key'),
+      onDismissed: (_) => Navigator.of(context).pop(),
+      child: StreamBuilder<List<StoryModel>>(
+          stream: storyBloc.getStories,
+          builder:
+              (BuildContext context, AsyncSnapshot<List<StoryModel>> snapshot) {
+            Widget child;
+            if (snapshot.hasData) {
+              allStories = snapshot.data;
+              stories = snapshot.data
+                  .where((element) =>
+                      element.userId == widget.users[currentGlobalIndex].userId)
+                  .toList();
+              child = PageView.builder(
+                  itemCount: widget.users.length,
+                  controller: globalPageController,
+                  itemBuilder: (context, userIndex) {
+                    var currentUserStories = snapshot.data
+                        .where(
+                            (e) => e.userId == widget.users[userIndex].userId)
+                        .toList();
+                    stories = currentUserStories;
+                    if (userIndex == currentPageValue.floor()) {
+                      return Transform(
+                        transform: Matrix4.identity()
+                          ..rotateX(currentPageValue - userIndex),
+                        child: Container(
+                          child: storyWidget(currentUserStories, userIndex),
+                        ),
+                      );
+                    } else if (userIndex == currentPageValue.floor() + 1) {
+                      return Transform(
+                        transform: Matrix4.identity()
+                          ..rotateX(currentPageValue - userIndex),
+                        child: Container(
+                            child: storyWidget(currentUserStories, userIndex)),
+                      );
+                    } else {
+                      return storyWidget(currentUserStories, userIndex);
+                    }
+                  });
+            } else {
+              child = Container();
+            }
 
-                return child;
-              }),
-        ));
+            return child;
+          }),
+    ));
   }
 
   void _onTapUp(TapUpDetails details, List<StoryModel> stories) {
@@ -180,7 +181,8 @@ class _StoryScreenState extends State<StoryScreen>
         }
       });
     } else if (dx > 2 * screenWidth / 3) {
-      print('currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex size ${stories.length}');
+      print(
+          'currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex size ${stories.length}');
       setState(() {
         if (currentIndex + 1 < stories.length) {
           currentIndex += 1;
@@ -191,9 +193,14 @@ class _StoryScreenState extends State<StoryScreen>
 //            animController.reset();
             currentIndex = 0;
             currentGlobalIndex += 1;
-            stories = allStories.where((element) => element.userId == widget.users[currentGlobalIndex].userId).toList();
-            print('currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex');
-            globalPageController.animateToPage(currentGlobalIndex, duration: Duration(seconds: 1), curve: Curves.ease);
+            stories = allStories
+                .where((element) =>
+                    element.userId == widget.users[currentGlobalIndex].userId)
+                .toList();
+            print(
+                'currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex');
+            globalPageController.animateToPage(currentGlobalIndex,
+                duration: Duration(seconds: 1), curve: Curves.ease);
             loadStory(story: stories[currentIndex]);
           } else {
             Navigator.of(context).pop();
@@ -214,7 +221,6 @@ class _StoryScreenState extends State<StoryScreen>
   }
 
   void loadStory({StoryModel story, bool animateToPage = true}) {
-    print('load story ${story.url}');
     animController.stop();
     animController.reset();
     if (videoPlayerController != null) {
@@ -228,7 +234,6 @@ class _StoryScreenState extends State<StoryScreen>
       case MediaType.VIDEO:
         videoPlayerController?.dispose();
         videoPlayerController = null;
-        print('video story ${story.url}');
         videoPlayerController = VideoPlayerController.network(story.url)
           ..initialize().then((_) {
             setState(() {});
@@ -251,8 +256,7 @@ class _StoryScreenState extends State<StoryScreen>
 
   Widget storyWidget(List<StoryModel> currentUserStories, int userIndex) {
     return GestureDetector(
-      onTapUp: (details) =>
-          _onTapUp(details, currentUserStories),
+      onTapUp: (details) => _onTapUp(details, currentUserStories),
       child: Stack(children: [
         PageView.builder(
             physics: NeverScrollableScrollPhysics(),
