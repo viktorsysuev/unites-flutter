@@ -65,8 +65,6 @@ class _StoryScreenState extends State<StoryScreen>
             currentIndex += 1;
             loadStory(story: stories[currentIndex]);
           } else {
-//            currentIndex = 0;
-//            loadStory(story: stories[currentIndex]);
             Navigator.of(context).pop();
           }
         });
@@ -76,7 +74,6 @@ class _StoryScreenState extends State<StoryScreen>
       }
 
       globalPageController.addListener(() {
-//        print('globalPageController.page ${globalPageController.page}, currentGlobalIndex.toDouble() equal ${globalPageController.page == currentGlobalIndex.toDouble()}');
         if (globalPageController.page == currentGlobalIndex.toDouble()) {
           animController.forward();
           videoPlayerController?.play();
@@ -181,16 +178,12 @@ class _StoryScreenState extends State<StoryScreen>
         }
       });
     } else if (dx > 2 * screenWidth / 3) {
-      print(
-          'currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex size ${stories.length}');
       setState(() {
         if (currentIndex + 1 < stories.length) {
           currentIndex += 1;
           loadStory(story: stories[currentIndex]);
         } else {
           if (currentGlobalIndex < widget.users.length - 1) {
-//            animController.stop();
-//            animController.reset();
             currentIndex = 0;
             currentGlobalIndex += 1;
             stories = allStories
@@ -205,8 +198,6 @@ class _StoryScreenState extends State<StoryScreen>
           } else {
             Navigator.of(context).pop();
           }
-//          currentIndex = 0;
-//          loadStory(story: stories[currentIndex]);
         }
       });
     } else {
