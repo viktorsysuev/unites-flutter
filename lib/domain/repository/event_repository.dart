@@ -22,7 +22,7 @@ abstract class EventRepository {
 
   Future<List<EventModel>> getAllEvents();
 
-  Future<List<UserModel>> getEventParticipantsFomDB(String eventId);
+  Future<List<UserModel>> getEventParticipantsFromDB(String eventId);
 
   Future<List<CommentWithUser>> getEventComments(String eventId);
 

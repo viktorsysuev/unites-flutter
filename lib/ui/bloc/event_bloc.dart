@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:unites_flutter/domain/interactors/event_interactor.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/comment_model.dart';
@@ -16,13 +17,22 @@ import 'package:unites_flutter/data/repository/event_repository_impl.dart';
 
 @injectable
 class EventsBloc {
-  final _eventRepository = getIt<EventRepositoryImpl>();
+
+  EventsBloc() {
+    events;
+    eventWithParticipants;
+    participants;
+    _addEventsController.stream.listen(_handleAddEvent);
+  }
+
+  final _eventInteractor = getIt<EventInteractor>();
 
   final _eventFetcher = StreamController<EventModel>.broadcast();
 
   final _eventsController = StreamController<List<EventModel>>.broadcast();
 
   final _participantsController = StreamController<List<UserModel>>.broadcast();
+
 
   final _commentsController =
       StreamController<List<CommentWithUser>>.broadcast();
@@ -51,22 +61,14 @@ class EventsBloc {
 
   StreamSink<EventModel> get inAddEvent => _addEventsController.sink;
 
-  EventsBloc() {
-    events;
-    eventWithParticipants;
-    participants;
-
-    _addEventsController.stream.listen(_handleAddEvent);
-  }
-
   void getEvents() async {
-    var events = await _eventRepository.getAllEvents();
+    var events = await _eventInteractor.getAllEvents();
     _eventsController.sink.add(events);
   }
 
   void getEventWithParticipants(String eventId) async {
-    var event = await _eventRepository.getEvent(eventId);
-    var participants = await _eventRepository.getEventParticipants(eventId);
+    var event = await _eventInteractor.getEvent(eventId);
+    var participants = await _eventInteractor.getEventParticipants(eventId);
     var res = EventWithParticipants();
     res.eventModel = event;
     res.participants = participants;
@@ -93,7 +95,7 @@ class EventsBloc {
   }
 
   void getMyEventsWithParticipants() async {
-    var events = await _eventRepository.getMyEvents();
+    var events = await _eventInteractor.getMyEvents();
     _myEventsWithParticipantsController.sink.add(events);
   }
 
@@ -124,31 +126,31 @@ class EventsBloc {
 
   getEventParticipants(String eventId) async {
     var participants =
-        await _eventRepository.getEventParticipantsFomDB(eventId);
+        await _eventInteractor.getEventParticipantsFromDB(eventId);
     _participantsController.sink.add(participants);
   }
 
   getEventCommetns(String eventId) async {
-    var comments = await _eventRepository.getEventComments(eventId);
+    var comments = await _eventInteractor.getEventComments(eventId);
     _commentsController.sink.add(comments);
   }
 
   sendComment(String text, String eventId) async {
-    await _eventRepository.addNewComment(text, eventId);
+    await _eventInteractor.addNewComment(text, eventId);
     getEventCommetns(eventId);
   }
 
   createEvent(EventModel eventModel) {
     inAddEvent.add(eventModel);
-    _eventRepository.addNewEvent(eventModel);
+    _eventInteractor.addNewEvent(eventModel);
   }
 
   joinEvent(String eventId) async {
-    await _eventRepository.joinEvent(eventId);
+    await _eventInteractor.joinEvent(eventId);
   }
 
   leftEvent(String eventId) async {
-    await _eventRepository.leftEvent(eventId);
+    await _eventInteractor.leftEvent(eventId);
   }
 
 //  bool isMember(String eventId) {
@@ -157,18 +159,18 @@ class EventsBloc {
 //  }
 
   initEvetns() async {
-    var events = await _eventRepository.initEvents();
+    var events = await _eventInteractor.initEvents();
     _eventsController.sink.add(events);
   }
 
   fetchEvent(String eventId) {
-    _eventRepository
+    _eventInteractor
         .getEvent(eventId)
         .then((value) => _eventFetcher.sink.add(value));
   }
 
   Future<bool> isMember(String eventId) async {
-    return await _eventRepository.isParticipant(eventId);
+    return await _eventInteractor.isParticipant(eventId);
   }
 
   dispose() {

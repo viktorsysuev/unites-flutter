@@ -20,7 +20,6 @@ class EventRepositoryImpl implements EventRepository {
   final db = Firestore.instance;
   var userRepository = getIt<UserRepositoryImpl>();
 
-  
   @override
   Future<List<EventModel>> initEvents() async {
     var events = <EventModel>[];
@@ -159,7 +158,7 @@ class EventRepositoryImpl implements EventRepository {
   }
 
   @override
-  Future<List<UserModel>> getEventParticipantsFomDB(String eventId) async {
+  Future<List<UserModel>> getEventParticipantsFromDB(String eventId) async {
     return DatabaseProvider.db.getEventParticipants(eventId);
   }
 

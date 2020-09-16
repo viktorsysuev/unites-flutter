@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/domain/repository/notification_repository.dart';
+import 'package:unites_flutter/domain/repository/user_repository.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/notification_model.dart';
@@ -11,7 +12,9 @@ import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 @injectable
 class NotificationRepositoryImpl implements NotificationRepository {
 
-  var userRepository = getIt<UserRepositoryImpl>();
+  NotificationRepositoryImpl(this.userRepository);
+
+  UserRepositoryImpl userRepository;
 
   final firestore = Firestore.instance;
 

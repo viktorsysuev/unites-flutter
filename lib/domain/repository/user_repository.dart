@@ -7,10 +7,11 @@ import 'package:unites_flutter/domain/models/user_model.dart';
 
 abstract class UserRepository {
 
-
   Future<bool> isUserExist();
 
   void createNewUser(UserModel user);
+
+  UserModel getCurrentUser();
 
   void updateUser(UserModel user);
 

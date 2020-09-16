@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:unites_flutter/domain/interactors/user_interactor.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
@@ -9,8 +10,8 @@ import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
 @injectable
 class UsersBloc {
-  var userRepository = getIt<UserRepositoryImpl>();
-  var storyRepository = getIt<StoryRepositoryImpl>();
+  var userInteractor = getIt<UserInteractor>();
+  var storyInteractor = getIt<StoryRepositoryImpl>();
 
   final _userFetcher = PublishSubject<UserModel>();
   final _contactsFetcher = PublishSubject<List<UserModel>>();
@@ -24,32 +25,32 @@ class UsersBloc {
 
   initUsers() async{
     var firestoreDB = Firestore.instance;
-    storyRepository.initStories();
+    storyInteractor.initStories();
     await firestoreDB.collection('users').getDocuments().then((value) => {
       value.documents.forEach((element) {
         DatabaseProvider.db.insertData('users', element.data);
       }),
     });
 
-    await userRepository.getCurrentUserId();
+    await userInteractor.getCurrentUserId();
   }
 
   fetchCurrentUser() async {
-    var userId = userRepository.currentUser.userId;
-    var user = await userRepository.getUser(userId);
+    var userId = userInteractor.getCurrentUser().userId;
+    var user = await userInteractor.getUser(userId);
     _userFetcher.sink.add(user);
   }
 
   getUserById(String userId) async {
-    var user = await userRepository.getUser(userId);
+    var user = await userInteractor.getUser(userId);
     _userFetcher.sink.add(user);
   }
 
   fetchContacts() async {
     var currentUserId;
     var contacts = <UserModel>[];
-    if(userRepository.currentUser != null){
-      currentUserId = userRepository.currentUser.userId;
+    if(userInteractor.getCurrentUser() != null){
+      currentUserId = userInteractor.getCurrentUser().userId;
       contacts = await DatabaseProvider.db.getContacts(currentUserId);
     }
     _contactsFetcher.sink.add(contacts);

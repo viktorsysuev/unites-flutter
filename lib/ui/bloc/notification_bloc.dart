@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
+import 'package:unites_flutter/domain/interactors/notification_interactor.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/notification_model.dart';
@@ -12,8 +13,8 @@ import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 @injectable
 class NotificationBloc {
   var firestore = Firestore.instance;
-  var notificationRepository = getIt<NotificationRepositoryImpl>();
   var userRepository = getIt<UserRepositoryImpl>();
+  var notificationInteractor = getIt<NotificationInteractor>();
   var countNotification = 0;
 
   final _notificationsController =
@@ -26,22 +27,22 @@ class NotificationBloc {
   Stream<int> get countUnread => _notificationsUnreadCounter.stream;
 
   void initNotifications() {
-    notificationRepository.initNotifications();
+    notificationInteractor.initNotifications();
   }
 
-  getNotifications() async {
-    var notifications = await notificationRepository.getNotifications();
+  void getNotifications() async {
+    var notifications = await notificationInteractor.getNotifications();
     _notificationsController.sink.add(notifications);
   }
 
-  getUnreadNotification() async {
-    var count = await notificationRepository.getUnreadCountNotifications();
+  void getUnreadNotification() async {
+    var count = await notificationInteractor.getUnreadCountNotifications();
     print('getUnreadNotification $count');
     _notificationsUnreadCounter.sink.add(count);
   }
 
   Future<void> setNotificationsAsRead() async {
-    await notificationRepository.setNotificationsAsRead();
+    await notificationInteractor.setNotificationsAsRead();
     getUnreadNotification();
   }
 

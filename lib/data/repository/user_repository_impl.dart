@@ -60,4 +60,9 @@ class UserRepositoryImpl implements UserRepository {
   void logout() async {
     await auth.signOut();
   }
+
+  @override
+  UserModel getCurrentUser() {
+    return currentUser;
+  }
 }

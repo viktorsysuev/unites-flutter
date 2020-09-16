@@ -15,9 +15,10 @@ import 'package:unites_flutter/ui/profile/userInfo_screen.dart';
 import 'package:unites_flutter/ui/widgets/little_widgets_collection.dart';
 
 class EventInfoScreen extends StatefulWidget {
-  String eventId;
 
   EventInfoScreen({@required this.eventId});
+
+  final String eventId;
 
   @override
   _EventInfoScreenState createState() => _EventInfoScreenState();
