@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
@@ -20,8 +19,8 @@ class EventsOnMapScreen extends StatefulWidget {
 class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
   final eventBloc = getIt<EventsBloc>();
 
-  String _darkMapStyle;
-  String _normalMapStyle;
+  late String _darkMapStyle;
+  late String _normalMapStyle;
 
   @override
   void initState() {
@@ -53,9 +52,9 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
   var latitude = 0.0;
   var longitude = 0.0;
   final Geolocator _geolocator = Geolocator();
-  Position _currentPosition;
+  Position? _currentPosition;
 
-  GoogleMapController mapController;
+  GoogleMapController? mapController;
 
   static const LatLng _center = const LatLng(45.521563, -122.677433);
 
@@ -68,13 +67,12 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
 
 
   _getCurrentLocation() async {
-    await _geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
       setState(() {
         _currentPosition = position;
 
-        mapController.animateCamera(
+        mapController?.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(
               target: LatLng(position.latitude, position.longitude),
@@ -93,10 +91,10 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
 
     if (mapController != null ) {
       if (ThemeController.of(context).currentTheme == 'dark') {
-        mapController.setMapStyle(_darkMapStyle);
+        mapController?.setMapStyle(_darkMapStyle);
       }
       else {
-        mapController.setMapStyle(_normalMapStyle);
+        mapController?.setMapStyle(_normalMapStyle);
       }
     }
     return Scaffold(
@@ -106,12 +104,12 @@ class _EventsOnMapScreenState extends State<EventsOnMapScreen> {
             (BuildContext context, AsyncSnapshot<List<EventModel>> snapshot) {
           Widget child;
           if (snapshot.hasData) {
-            snapshot.data.forEach((element) {
+            snapshot.data?.forEach((element) {
               if (element.coordinates != null && element.id != null) {
                 final marker = Marker(
                   markerId: MarkerId(element.id),
-                  position: LatLng(element.coordinates.latitude,
-                      element.coordinates.longitude),
+                  position: LatLng(element.coordinates!.latitude,
+                      element.coordinates!.longitude),
                   infoWindow: InfoWindow(
                     onTap: () {
                       Navigator.push(

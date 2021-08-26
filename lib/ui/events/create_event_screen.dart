@@ -12,7 +12,7 @@ import '../home.dart';
 import 'map/select_addrees_screen.dart';
 
 class CreateEventScreen extends StatefulWidget {
-  CreateEventScreen({Key key}) : super(key: key);
+  CreateEventScreen({Key? key}) : super(key: key);
 
   @override
   _CreateEventScreenState createState() => _CreateEventScreenState();
@@ -32,7 +32,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     super.didChangeDependencies();
   }
 
-
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final companyController = TextEditingController();
@@ -44,7 +43,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TimeOfDay startTime = TimeOfDay.now();
   DateTime endDate = DateTime.now();
   TimeOfDay endTime = TimeOfDay.now();
-  GeoPoint coordinates;
+  GeoPoint? coordinates;
 
   _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.push(
@@ -54,9 +53,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     var arrString = result.toString().split(" ");
     var res = "";
 
-    coordinates = GeoPoint(double.parse(arrString[arrString.length - 2]), double.parse(arrString[arrString.length - 1]));
+    coordinates = GeoPoint(double.parse(arrString[arrString.length - 2]),
+        double.parse(arrString[arrString.length - 1]));
     arrString.forEach((element) {
-      if(element != arrString[arrString.length - 2] && element != arrString[arrString.length - 1]){
+      if (element != arrString[arrString.length - 2] &&
+          element != arrString[arrString.length - 1]) {
         res += '$element ';
       }
     });
@@ -105,8 +106,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Future<Null> _selectEndTime(BuildContext context) async {
-    final picked =
-        await showTimePicker(context: context, initialTime: endTime);
+    final picked = await showTimePicker(context: context, initialTime: endTime);
     if (picked != null && picked != endTime) {
       setState(() {
         endDate = DateTime(endDate.year, endDate.month, endDate.day,
@@ -134,7 +134,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Введите название';
                 }
                 return null;
@@ -154,7 +154,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Введите описание';
                 }
                 return null;
@@ -216,7 +216,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Заполните адрес';
                 }
                 return null;

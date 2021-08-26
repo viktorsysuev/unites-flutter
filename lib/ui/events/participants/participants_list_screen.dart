@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/ui/main.dart';
-import 'package:unites_flutter/ui/app.dart';
 import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/ui/profile/edit_profile_screen.dart';
@@ -10,7 +9,7 @@ import 'package:unites_flutter/ui/widgets/little_widgets_collection.dart';
 class ParticipantsListScreen extends StatefulWidget {
   String eventId;
 
-  ParticipantsListScreen({@required this.eventId});
+  ParticipantsListScreen({required this.eventId});
 
   @override
   _ParticipantsListScreenState createState() => _ParticipantsListScreenState();
@@ -53,7 +52,7 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
               Widget child;
               var bufferWidgets = <Widget>[];
               if (snapshot.hasData) {
-                snapshot.data.forEach((element) {
+                snapshot.data?.forEach((element) {
                   bufferWidgets.add(GestureDetector(
                       onTap: () => Navigator.push(
                           context,
@@ -75,7 +74,7 @@ class _ParticipantsListScreenState extends State<ParticipantsListScreen> {
                                       width: 50,
                                       height: 50,
                                       child: element.avatar != null
-                                          ? Image.network(element.avatar,
+                                          ? Image.network(element.avatar!,
                                               fit: BoxFit.cover)
                                           : Center(
                                               child: Text(

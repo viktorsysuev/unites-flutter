@@ -4,9 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/event_bloc.dart';
-import 'package:unites_flutter/domain/models/comment_model.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
-import 'package:unites_flutter/domain/models/event_model.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/ui/events/participants/participants_list_screen.dart';
@@ -15,8 +13,7 @@ import 'package:unites_flutter/ui/profile/userInfo_screen.dart';
 import 'package:unites_flutter/ui/widgets/little_widgets_collection.dart';
 
 class EventInfoScreen extends StatefulWidget {
-
-  EventInfoScreen({@required this.eventId});
+  EventInfoScreen({required this.eventId});
 
   final String eventId;
 
@@ -29,7 +26,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
   final formatter = DateFormat('yyyy-MM-dd hh:mm');
   var buttonText = '';
   var textEditingController = TextEditingController();
-  static const LatLng _center = const LatLng(45.521563, -122.677433);
+  static const LatLng _center = LatLng(45.521563, -122.677433);
 
   @override
   void didChangeDependencies() {
@@ -82,7 +79,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                           height: 300,
                           child: user.avatar != null
                               ? Image.network(
-                                  user.avatar,
+                                  user.avatar!,
                                   fit: BoxFit.cover,
                                 )
                               : Center(
@@ -115,7 +112,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                   physics: NeverScrollableScrollPhysics(),
                   scrollDirection: Axis.vertical,
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  itemCount: snapshot.data.length,
+                  itemCount: snapshot.data?.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Column(children: [
                       Row(children: [
@@ -126,26 +123,25 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => UserInfoScreen(
                                           userId:
-                                              snapshot.data[index].authorId)));
+                                              snapshot.data![index].authorId)));
                             },
                             child: CircleAvatar(
                               radius: 22,
                               backgroundColor: EditProfileScreen.colorById(
-                                  snapshot.data[index].authorId),
+                                  snapshot.data![index].authorId),
                               child: ClipOval(
                                 child: SizedBox(
                                   width: 300,
                                   height: 300,
-                                  child: snapshot.data[index].avatar != null
+                                  child: snapshot.data![index].avatar != null
                                       ? Image.network(
-                                          snapshot.data[index].avatar,
+                                          snapshot.data![index].avatar!,
                                           fit: BoxFit.cover,
                                         )
                                       : Center(
                                           child: Text(
-                                              '${snapshot.data[index].firstName[0]}${snapshot.data[index].firstName[0]}',
-                                              style: TextStyle(
-                                                  fontSize: 24),
+                                              '${snapshot.data![index].firstName[0]}${snapshot.data![index].firstName[0]}',
+                                              style: TextStyle(fontSize: 24),
                                               textAlign: TextAlign.center)),
                                 ),
                               ),
@@ -164,11 +160,11 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                                   builder: (context) =>
                                                       UserInfoScreen(
                                                           userId: snapshot
-                                                              .data[index]
+                                                              .data![index]
                                                               .authorId)));
                                         },
                                         child: Text(
-                                          '${snapshot.data[index].firstName} ${snapshot.data[index].lastName}',
+                                          '${snapshot.data![index].firstName} ${snapshot.data![index].lastName}',
                                           style: TextStyle(fontSize: 16.0),
                                         ))),
                                 Container(
@@ -176,7 +172,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     child: Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text(
-                                            '${getCommentTime(snapshot.data[index].createdAt)}',
+                                            '${getCommentTime(snapshot.data![index].createdAt!)}',
                                             textAlign: TextAlign.left))),
                               ],
                             ))
@@ -186,7 +182,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                           child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                '${snapshot.data[index].text}',
+                                '${snapshot.data![index].text}',
                                 textAlign: TextAlign.left,
                               )))
                     ]);
@@ -223,19 +219,20 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                     Padding(
                         padding: EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Center(
-                          child: Text('${snapshot.data.eventModel.name}',
+                          child: Text('${snapshot.data?.eventModel?.name}',
                               style: TextStyle(fontSize: 22.0)),
                         )),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Padding(
                         padding: EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Center(
-                          child: Text('${snapshot.data.eventModel.description}',
+                          child: Text(
+                              '${snapshot.data?.eventModel?.description}',
                               style: TextStyle(fontSize: 16.0)),
                         )),
                     Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
                     Center(
-                      child: Text('${snapshot.data.eventModel.company}',
+                      child: Text('${snapshot.data?.eventModel?.company}',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 16.0)),
                     ),
@@ -250,7 +247,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
-                            Text('${snapshot.data.eventModel.address}',
+                            Text('${snapshot.data?.eventModel?.address}',
                                 style: TextStyle(fontSize: 16.0)),
                             Container(margin: EdgeInsets.only(top: 16.0)),
                             Text('Начало:',
@@ -259,7 +256,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
                             Text(
-                                '${formatter.format(snapshot.data.eventModel.start)}',
+                                '${formatter.format(snapshot.data!.eventModel!.start!)}',
                                 style: TextStyle(fontSize: 16.0)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
                             Text('Завершение:',
@@ -268,7 +265,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                     fontWeight: FontWeight.bold)),
                             Container(margin: EdgeInsets.only(top: 8.0)),
                             Text(
-                                '${formatter.format(snapshot.data.eventModel.end)}',
+                                '${formatter.format(snapshot.data!.eventModel!.end!)}',
                                 style: TextStyle(fontSize: 16.0)),
                             Container(margin: EdgeInsets.only(top: 16.0)),
                             RichText(
@@ -283,23 +280,19 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   ParticipantsListScreen(
-                                                      eventId: snapshot.data
-                                                          .eventModel.id)));
+                                                      eventId: snapshot.data!
+                                                          .eventModel!.id)));
                                     }),
                             ),
                           ]),
                     ),
-                    _buildParticipantsScroller(snapshot.data.participants),
+                    _buildParticipantsScroller(snapshot.data!.participants!),
                     Container(margin: EdgeInsets.only(top: 12.0, bottom: 12.0)),
                     Container(
                       padding: EdgeInsets.only(left: 12.0, right: 12.0),
                       width: double.infinity,
                       child: OutlineButton(
                         borderSide: BorderSide(color: Colors.blue),
-                        child: Text(
-                          '$buttonText',
-                          style: TextStyle(color: Colors.blue),
-                        ),
                         onPressed: () {
                           eventBloc
                               .isMember(widget.eventId)
@@ -325,6 +318,10 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                             }
                           });
                         },
+                        child: Text(
+                          '$buttonText',
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ),
                     ),
                     Container(
@@ -337,6 +334,10 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                     // Edit text
                     Container(
                       margin: EdgeInsets.all(12.0),
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(22.0),
+                          color: Colors.black12),
                       child: Row(
                         children: <Widget>[
                           // Button send image
@@ -358,6 +359,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
 
                           // Button send message
                           Material(
+                            color: Colors.transparent,
                             child: Container(
                               padding: EdgeInsets.only(right: 8.0),
                               child: IconButton(
@@ -374,14 +376,9 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
                                 color: Colors.blueAccent,
                               ),
                             ),
-                            color: Colors.transparent,
                           ),
                         ],
                       ),
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(22.0),
-                          color: Colors.black12),
                     ),
 
                     _buildCommentsList()
