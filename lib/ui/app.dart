@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:unites_flutter/ui/home.dart';
 import 'package:unites_flutter/ui/auth/intro_screen.dart';
 import 'package:unites_flutter/ui/util/theme_controller.dart';
 
 class App extends StatelessWidget {
-  final ThemeController themeController;
+  const App({Key? key, required this.themeController}) : super(key: key);
 
-  const App({Key key, this.themeController}) : super(key: key);
+  final ThemeController themeController;
 
   @override
   Widget build(BuildContext context) {
-    return  AnimatedBuilder(
+    return AnimatedBuilder(
       animation: themeController,
       builder: (context, _) {
         return ThemeControllerProvider(

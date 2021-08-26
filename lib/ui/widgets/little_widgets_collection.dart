@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class WidgetErrorLoad extends StatelessWidget {
   const WidgetErrorLoad({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -27,7 +27,7 @@ class WidgetErrorLoad extends StatelessWidget {
 
 class WidgetDataLoad extends StatelessWidget {
   const WidgetDataLoad({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -35,13 +35,13 @@ class WidgetDataLoad extends StatelessWidget {
     return Column(
       children: <Widget>[
         SizedBox(
+          width: 60,
+          height: 60,
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(
               Colors.red,
             ),
           ),
-          width: 60,
-          height: 60,
         ),
         const Padding(
           padding: EdgeInsets.only(top: 16),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:unites_flutter/ui/main.dart';
-import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/ui/bloc/notification_bloc.dart';
 import 'package:unites_flutter/ui/bloc/user_bloc.dart';
 import 'package:unites_flutter/ui/contacts/contacts_list_screen.dart';

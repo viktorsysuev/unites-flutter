@@ -9,9 +9,9 @@ class ThemeController extends ChangeNotifier {
   }
 
   final SharedPreferences _prefs;
-  String _currentTheme;
+  String? _currentTheme;
 
-  String get currentTheme => _currentTheme;
+  String get currentTheme => _currentTheme!;
 
   void setTheme(String theme) {
     _currentTheme = theme;
@@ -22,16 +22,24 @@ class ThemeController extends ChangeNotifier {
   }
 
   static ThemeController of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<ThemeControllerProvider>();
+    final provider =
+        context.dependOnInheritedWidgetOfExactType<ThemeControllerProvider>();
+    if (provider == null) {
+      throw Exception('Empty provider');
+    }
+
     return provider.controller;
   }
 }
 
 class ThemeControllerProvider extends InheritedWidget {
-  const ThemeControllerProvider({Key key, this.controller, Widget child}) : super(key: key, child: child);
+  const ThemeControllerProvider(
+      {Key? key, required this.controller, required Widget child})
+      : super(key: key, child: child);
 
   final ThemeController controller;
 
   @override
-  bool updateShouldNotify(ThemeControllerProvider old) => controller != old.controller;
+  bool updateShouldNotify(ThemeControllerProvider old) =>
+      controller != old.controller;
 }
