@@ -3,11 +3,16 @@ enum MediaType { VIDEO, IMAGE }
 class StoryModel {
   String url;
   String storyId;
-  MediaType mediaType;
+  MediaType? mediaType;
   int duration;
   String userId;
 
-  StoryModel({this.storyId, this.mediaType, this.userId, this.duration, this.url});
+  StoryModel(
+      {this.storyId = '',
+      this.mediaType,
+      this.userId = '',
+      this.duration = 0,
+      this.url = ''});
 
   factory StoryModel.fromJson(Map<dynamic, dynamic> json) =>
       _StoryModelFromJson(json);
@@ -19,8 +24,7 @@ class StoryModel {
         url: table['url'],
         storyId: table['storyId'],
         mediaType: MediaType.values.firstWhere(
-            (e) => e.toString() == 'MediaType.' + table['mediaType'],
-            orElse: () => null),
+            (e) => e.toString() == 'MediaType.' + table['mediaType']),
         userId: table['userId'],
         duration: table['duration']);
   }
@@ -33,9 +37,8 @@ StoryModel _StoryModelFromJson(Map<dynamic, dynamic> json) {
     url: json['url'] as String,
     storyId: json['storyId'] as String,
     duration: json['duration'],
-    mediaType: MediaType.values.firstWhere(
-        (e) => e.toString() == 'MediaType.' + json['mediaType'],
-        orElse: () => null),
+    mediaType: MediaType.values
+        .firstWhere((e) => e.toString() == 'MediaType.' + json['mediaType']),
     userId: json['userId'] as String,
   );
 }

@@ -1,28 +1,21 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unites_flutter/domain/models/participants_model.dart';
 
 class CommentModel {
   String commentId;
   String authorId;
-  DateTime createdAt;
+  DateTime? createdAt;
   String eventId;
   String text;
 
   CommentModel(
-      {this.commentId,
-        this.authorId,
-        this.createdAt,
-        this.eventId,
-        this.text});
+      {this.commentId = '',
+      this.authorId = '',
+      this.createdAt,
+      this.eventId = '',
+      this.text = ''});
 
   factory CommentModel.fromJson(Map<dynamic, dynamic> json) =>
       _CommentModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _CommentModelToJson(this);
-
-  Map<String, dynamic> toMap() => _CommentModelToMap(this);
 
   factory CommentModel.fromDB(Map<String, dynamic> table) {
     return CommentModel(
@@ -33,18 +26,23 @@ class CommentModel {
         text: table['text']);
   }
 
+  Map<String, dynamic> toJson() => _CommentModelToJson(this);
+
+  Map<String, dynamic> toMap() => _CommentModelToMap(this);
+
   @override
-  String toString() => "Event <$commentId>";
+  String toString() => 'Event <$commentId>';
 }
 
 CommentModel _CommentModelFromJson(Map<dynamic, dynamic> json) {
   return CommentModel(
-    commentId: json['commentId'] as String,
-    authorId: json['authorId'] as String,
-    createdAt: json['createdAt'] == null ? null : (json['createdAt'] as Timestamp).toDate(),
-    eventId: json['eventId'] as String,
-    text: json['text'] as String
-  );
+      commentId: json['commentId'] as String,
+      authorId: json['authorId'] as String,
+      createdAt: json['createdAt'] == null
+          ? null
+          : (json['createdAt'] as Timestamp).toDate(),
+      eventId: json['eventId'] as String,
+      text: json['text'] as String);
 }
 
 Map<String, dynamic> _CommentModelToJson(CommentModel instance) =>
@@ -56,11 +54,11 @@ Map<String, dynamic> _CommentModelToJson(CommentModel instance) =>
       'text': instance.text,
     };
 
-Map<String, dynamic> _CommentModelToMap(CommentModel instance) => <String, dynamic>{
-  'commentId': instance.commentId,
-  'authorId': instance.authorId,
-  'createdAt': instance.createdAt.toIso8601String(),
-  'eventId': instance.eventId,
-  'text': instance.text,
-};
-
+Map<String, dynamic> _CommentModelToMap(CommentModel instance) =>
+    <String, dynamic>{
+      'commentId': instance.commentId,
+      'authorId': instance.authorId,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'eventId': instance.eventId,
+      'text': instance.text,
+    };

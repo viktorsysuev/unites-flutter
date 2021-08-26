@@ -2,12 +2,19 @@ class ParticipantsModel {
   String docId;
   String eventId;
   String userId;
-  String avatar;
+  String? avatar;
   String firstName;
   String lastName;
   String role;
 
-  ParticipantsModel({this.docId, this.eventId, this.userId, this.avatar, this.firstName, this.lastName, this.role});
+  ParticipantsModel(
+      {this.docId = '',
+      this.eventId = '',
+      this.userId = '',
+      this.avatar,
+      this.firstName = '',
+      this.lastName = '',
+      this.role = ''});
 
   factory ParticipantsModel.fromJson(Map<dynamic, dynamic> json) =>
       _ParticipantsModelFromJson(json);

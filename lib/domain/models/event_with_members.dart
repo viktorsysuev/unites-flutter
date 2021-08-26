@@ -9,23 +9,23 @@ class EventWithMembers {
   String phoneNumber;
   String email;
   String address;
-  GeoPoint coordinates;
-  DateTime start;
-  DateTime end;
-  List<ParticipantsModel> participants;
+  GeoPoint? coordinates;
+  DateTime? start;
+  DateTime? end;
+  List<ParticipantsModel>? participants;
 
   EventWithMembers(
-  {this.id,
-  this.name,
-  this.description,
-  this.company,
-  this.phoneNumber,
-  this.email,
-  this.address,
-  this.coordinates,
-  this.start,
-  this.end,
-  this.participants});
+      {required this.id,
+      this.name = '',
+      this.description = '',
+      this.company = '',
+      this.phoneNumber = '',
+      this.email = '',
+      this.address = '',
+      this.coordinates,
+      this.start,
+      this.end,
+      this.participants});
 
 //  factory EventWithMembers.fromJson(Map<dynamic, dynamic> json) =>
 //      _EventModelFromJson(json);
@@ -34,7 +34,8 @@ class EventWithMembers {
 //
 //  Map<String, dynamic> toMap() => _EventModelToMap(this);
 
-  factory EventWithMembers.fromDB(Map<String, dynamic> table, List<Map<String, dynamic>> participants) {
+  factory EventWithMembers.fromDB(
+      Map<String, dynamic> table, List<Map<String, dynamic>> participants) {
     return EventWithMembers(
         id: table['eventId'],
         name: table['name'],
@@ -50,7 +51,10 @@ class EventWithMembers {
             : null,
         start: DateTime.parse(table['start']),
         end: DateTime.parse(table['end']),
-        participants: participants.map((e) => ParticipantsModel.fromJson(e)));
+        participants: participants
+            .toList()
+            .map((e) => ParticipantsModel.fromJson(e))
+            .toList());
   }
 
   @override

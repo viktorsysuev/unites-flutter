@@ -1,12 +1,11 @@
-
-
-
-
 class ChatModel {
   String chatId;
   String chatWith;
 
-  ChatModel({this.chatId, this.chatWith});
+  ChatModel({
+    this.chatId = '',
+    this.chatWith = '',
+  });
 
   factory ChatModel.fromJson(Map<dynamic, dynamic> json) =>
       _ChatModelFromJson(json);

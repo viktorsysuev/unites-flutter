@@ -1,32 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unites_flutter/domain/models/participants_model.dart';
 
 class CommentWithUser {
   String commentId;
   String authorId;
-  DateTime createdAt;
+  DateTime? createdAt;
   String eventId;
   String text;
   String firstName;
   String lastName;
-  String avatar;
+  String? avatar;
 
   CommentWithUser(
-      {this.commentId,
-      this.authorId,
+      {required this.commentId,
+      required this.authorId,
       this.createdAt,
-      this.eventId,
-      this.text,
-      this.firstName,
-      this.lastName,
+      this.eventId = '',
+      this.text = '',
+      this.firstName = '',
+      this.lastName = '',
       this.avatar});
 
   factory CommentWithUser.fromJson(Map<dynamic, dynamic> json) =>
       _CommentWithUserFromJson(json);
-
-  Map<String, dynamic> toJson() => _CommentWithUserToJson(this);
-
-  Map<String, dynamic> toMap() => _CommentWithUserToMap(this);
 
   factory CommentWithUser.fromDB(Map<String, dynamic> table) {
     return CommentWithUser(
@@ -40,8 +35,12 @@ class CommentWithUser {
         avatar: table['avatar']);
   }
 
+  Map<String, dynamic> toJson() => _CommentWithUserToJson(this);
+
+  Map<String, dynamic> toMap() => _CommentWithUserToMap(this);
+
   @override
-  String toString() => "Event <$commentId>";
+  String toString() => 'Event <$commentId>';
 }
 
 CommentWithUser _CommentWithUserFromJson(Map<dynamic, dynamic> json) {
@@ -68,7 +67,7 @@ Map<String, dynamic> _CommentWithUserToMap(CommentWithUser instance) =>
     <String, dynamic>{
       'commentId': instance.commentId,
       'authorId': instance.authorId,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
       'eventId': instance.eventId,
       'text': instance.text,
     };

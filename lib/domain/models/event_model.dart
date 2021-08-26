@@ -9,26 +9,26 @@ class EventModel {
   String phoneNumber;
   String email;
   String address;
-  GeoPoint coordinates;
-  DateTime start;
-  DateTime end;
+  GeoPoint? coordinates;
+  DateTime? start;
+  DateTime? end;
 
-  DocumentReference reference;
+  DocumentReference? reference;
 
   EventModel(
-      {this.id,
-      this.name,
-      this.description,
-      this.company,
-      this.phoneNumber,
-      this.email,
-      this.address,
-      this.coordinates,
-      this.start,
-      this.owner,
-      this.end});
+      {this.id = '',
+        this.name = '',
+        this.description = '',
+        this.company = '',
+        this.phoneNumber = '',
+        this.email = '',
+        this.address = '',
+        this.coordinates,
+        this.start,
+        this.owner = '',
+        this.end});
 
-  factory EventModel.fromJson(Map<dynamic, dynamic> json) =>
+  factory EventModel.fromJson(Map<String, dynamic> json) =>
       _EventModelFromJson(json);
 
   Map<String, dynamic> toJson() => _EventModelToJson(this);
@@ -53,10 +53,10 @@ class EventModel {
   }
 
   @override
-  String toString() => "Event <$name>";
+  String toString() => 'Event <$name>';
 }
 
-EventModel _EventModelFromJson(Map<dynamic, dynamic> json) {
+EventModel _EventModelFromJson(Map<String, dynamic> json) {
   return EventModel(
     id: json['id'] as String,
     name: json['name'] as String,
@@ -88,17 +88,17 @@ Map<String, dynamic> _EventModelToJson(EventModel instance) =>
     };
 
 Map<String, dynamic> _EventModelToMap(EventModel instance) => <String, dynamic>{
-      'eventId': instance.id,
-      'name': instance.name,
-      'owner': instance.owner,
-      'description': instance.description,
-      'company': instance.company,
-      'phoneNumber': instance.phoneNumber,
-      'email': instance.email,
-      'address': instance.address,
-      'coordinates': instance.coordinates != null
-          ? '${instance.coordinates.latitude} ${instance.coordinates.longitude}'
-          : null,
-      'start': instance.start.toIso8601String(),
-      'end': instance.end.toIso8601String(),
-    };
+  'eventId': instance.id,
+  'name': instance.name,
+  'owner': instance.owner,
+  'description': instance.description,
+  'company': instance.company,
+  'phoneNumber': instance.phoneNumber,
+  'email': instance.email,
+  'address': instance.address,
+  'coordinates': instance.coordinates != null
+      ? '${instance.coordinates?.latitude} ${instance.coordinates?.longitude}'
+      : null,
+  'start': instance.start?.toIso8601String(),
+  'end': instance.end?.toIso8601String(),
+};

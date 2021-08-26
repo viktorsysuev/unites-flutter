@@ -8,18 +8,18 @@ class UserModel {
   String company;
   String token;
   String aboutMe;
-  String avatar;
+  String? avatar;
 
   UserModel(
-      {this.userId,
-      this.firstName,
-      this.lastName,
-      this.interests,
-      this.useful,
-      this.phone,
-      this.company,
-      this.token,
-      this.aboutMe,
+      {this.userId = '',
+      this.firstName = '',
+      this.lastName = '',
+      this.interests = '',
+      this.useful = '',
+      this.phone = '',
+      this.company = '',
+      this.token = '',
+      this.aboutMe = '',
       this.avatar});
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) =>

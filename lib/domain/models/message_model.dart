@@ -1,16 +1,18 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessageModel {
   String messageId;
   String text;
-  DateTime createdAt;
+  DateTime? createdAt;
   String chatId;
   bool isMine;
 
   MessageModel(
-      {this.messageId, this.text, this.createdAt, this.chatId, this.isMine});
+      {this.messageId = '',
+        this.text = '',
+        this.createdAt,
+        this.chatId = '',
+        this.isMine = false});
 
   factory MessageModel.fromJson(Map<dynamic, dynamic> json) =>
       _MessageModelFromJson(json);
