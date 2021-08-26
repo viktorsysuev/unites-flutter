@@ -8,13 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:thumbnails/thumbnails.dart';
 import 'package:path/path.dart' as path;
 import 'package:unites_flutter/ui/bloc/story_bloc.dart';
-import 'package:unites_flutter/ui/home.dart';
 import 'package:unites_flutter/domain/models/story_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
-import 'package:unites_flutter/ui/contacts/contacts_list_screen.dart';
 
 import '../main.dart';
 
@@ -24,10 +21,10 @@ class CreateStoryScreen extends StatefulWidget {
 }
 
 class _CreateStoryScreenState extends State<CreateStoryScreen> {
-  List<CameraDescription> _cameras;
-  CameraController cameraController;
-  File _file;
-  File videoThumb;
+  List<CameraDescription>? _cameras;
+  CameraController? cameraController;
+  File? _file;
+  File? videoThumb;
   var storyBloc = StoryBloc();
   final userRepository = getIt<UserRepositoryImpl>();
 
@@ -41,26 +38,28 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
 
   Future<void> _initCamera() async {
     _cameras = await availableCameras();
-    cameraController =
-        CameraController(_cameras[0], ResolutionPreset.ultraHigh);
-    await cameraController.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
+    if (_cameras != null && _cameras!.isNotEmpty) {
+      cameraController =
+          CameraController(_cameras![0], ResolutionPreset.ultraHigh);
+      await cameraController?.initialize().then((_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {});
+      });
+    }
   }
 
   @override
   void dispose() {
-    cameraController.dispose();
+    cameraController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (cameraController != null) {
-      if (!cameraController.value.isInitialized) {
+      if (cameraController != null && !cameraController!.value.isInitialized) {
         return Container(width: 0.0, height: 0.0);
       } else {
         return Scaffold(
@@ -73,12 +72,12 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
             child: Stack(
               alignment: FractionalOffset.center,
               children: <Widget>[
-                _file != null ? Image.file(_file) : _buildCameraPreview(),
+                _file != null ? Image.file(_file!) : _buildCameraPreview(),
                 videoThumb != null
                     ? Container(
                         width: double.infinity,
                         height: double.infinity,
-                        child: Image.file(videoThumb, fit: BoxFit.contain))
+                        child: Image.file(videoThumb!, fit: BoxFit.contain))
                     : Container(),
                 _file != null
                     ? Padding(
@@ -132,11 +131,11 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     return ClipRect(
       child: Container(
         child: Transform.scale(
-          scale: cameraController.value.aspectRatio / size.aspectRatio,
+          scale: cameraController!.value.aspectRatio / size.aspectRatio,
           child: Center(
             child: AspectRatio(
-              aspectRatio: cameraController.value.aspectRatio,
-              child: CameraPreview(cameraController),
+              aspectRatio: cameraController!.value.aspectRatio,
+              child: CameraPreview(cameraController!),
             ),
           ),
         ),
@@ -145,26 +144,26 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   Future<void> onCameraSwitch() async {
-    final cameraDescription = (cameraController.description == _cameras[0])
-        ? _cameras[1]
-        : _cameras[0];
+    final cameraDescription = (cameraController!.description == _cameras![0])
+        ? _cameras![1]
+        : _cameras![0];
     if (cameraController != null) {
-      await cameraController.dispose();
+      await cameraController!.dispose();
     }
     cameraController =
         CameraController(cameraDescription, ResolutionPreset.medium);
-    cameraController.addListener(() {
+    cameraController?.addListener(() {
       if (mounted) setState(() {});
-      if (cameraController.value.hasError) {
+      if (cameraController!.value.hasError) {
         final snackBar = SnackBar(
             content: Text(
-                'Camera error ${cameraController.value.errorDescription}'));
+                'Camera error ${cameraController?.value.errorDescription}'));
         Scaffold.of(context).showSnackBar(snackBar);
       }
     });
 
     try {
-      await cameraController.initialize();
+      await cameraController?.initialize();
     } on CameraException catch (e) {
       final snackBar = SnackBar(content: Text('$e'));
       Scaffold.of(context).showSnackBar(snackBar);
@@ -222,55 +221,54 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     );
   }
 
-  Future<FileSystemEntity> getLastImage() async {
-    final extDir = await getApplicationDocumentsDirectory();
-
-    final dirPath = '${extDir.path}/media';
-    final myDir = Directory(dirPath);
-
-    List<FileSystemEntity> _images;
-    _images = myDir.listSync(recursive: true, followLinks: false);
-    _images.sort((a, b) {
-      return b.path.compareTo(a.path);
-    });
-    var lastFile = _images[0];
-    var extension = path.extension(lastFile.path);
-    if (extension == '.jpeg') {
-      return lastFile;
-    } else {
-      var thumb = await Thumbnails.getThumbnail(
-          videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
-      return File(thumb);
-    }
-  }
+  // Future<FileSystemEntity> getLastImage() async {
+    // final extDir = await getApplicationDocumentsDirectory();
+    //
+    // final dirPath = '${extDir.path}/media';
+    // final myDir = Directory(dirPath);
+    //
+    // List<FileSystemEntity> _images;
+    // _images = myDir.listSync(recursive: true, followLinks: false);
+    // _images.sort((a, b) {
+    //   return b.path.compareTo(a.path);
+    // });
+    // var lastFile = _images[0];
+    // var extension = path.extension(lastFile.path);
+    // if (extension == '.jpeg') {
+    //   return lastFile;
+    // } else {
+    //   var thumb = await Thumbnails.getThumbnail(videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
+    //   return File(thumb);
+    // }
+  // }
 
   Future<void> pickFromGallery() async {
-    var videoPath;
-    var file = await FilePicker.getFile(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
-    if (file != null) {
-      videoPath = await Thumbnails.getThumbnail(
-          videoFile: file.path, imageType: ThumbFormat.PNG, quality: 30);
-    }
-    setState(() {
-      _file = file;
-      if (videoPath != null) {
-        if (getMediaType(file.path) == MediaType.VIDEO) {
-          videoThumb = File(videoPath);
-        }
-      }
-    });
+    // var videoPath;
+    // var file = await FilePicker.getFile(
+    //     type: FileType.custom,
+    //     allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
+    // if (file != null) {
+    //   // videoPath = await Thumbnails.getThumbnail(
+    //   //     videoFile: file.path, imageType: ThumbFormat.PNG, quality: 30);
+    // }
+    // setState(() {
+    //   _file = file;
+    //   if (videoPath != null) {
+    //     if (getMediaType(file.path) == MediaType.VIDEO) {
+    //       videoThumb = File(videoPath);
+    //     }
+    //   }
+    // });
   }
 
   void captureImage() async {
-    if (cameraController.value.isInitialized) {
+    if (cameraController!.value.isInitialized) {
       await SystemSound.play(SystemSoundType.click);
       final extDir = await getApplicationDocumentsDirectory();
       final dirPath = '${extDir.path}/media';
       await Directory(dirPath).create(recursive: true);
       final filePath = '$dirPath/${DateTime.now().toIso8601String()}.jpeg';
-      await cameraController.takePicture(filePath);
+      // await cameraController?.takePicture(filePath);
       setState(() {
         _file = File(filePath);
       });
@@ -278,18 +276,18 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   void createStory() async {
-    var metadata = StorageMetadata(contentType: lookupMimeType(_file.path));
-    var firebaseStorage =
-        FirebaseStorage.instance.ref().child(path.basename(_file.path));
-    var task = await firebaseStorage.putFile(_file, metadata);
-    await task.onComplete;
-    var url = await firebaseStorage.getDownloadURL();
-    var story = StoryModel();
-    story.userId = userRepository.currentUser.userId;
-    story.url = url;
-    story.mediaType = getMediaType(_file.path);
-    storyBloc.createStory(story);
-    Navigator.of(context).pop();
+    // var metadata = StorageMetadata(contentType: lookupMimeType(_file!.path));
+    // var firebaseStorage =
+    //     FirebaseStorage.instance.ref().child(path.basename(_file!.path));
+    // var task = await firebaseStorage.putFile(_file!, metadata);
+    // // await task.onComplete;
+    // var url = await firebaseStorage.getDownloadURL();
+    // var story = StoryModel();
+    // story.userId = userRepository.currentUser.userId;
+    // story.url = url;
+    // story.mediaType = getMediaType(_file!.path);
+    // storyBloc.createStory(story);
+    // Navigator.of(context).pop();
 //    await Navigator.of(context).pushAndRemoveUntil(
 //        MaterialPageRoute(builder: (context) => Home()),
 //        (Route<dynamic> route) => false);
@@ -297,7 +295,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
 
   MediaType getMediaType(String path) {
     var type = lookupMimeType(path);
-    if (type.split('/')[0] == 'image') {
+    if (type?.split('/')[0] == 'image') {
       return MediaType.IMAGE;
     } else {
       return MediaType.VIDEO;
