@@ -6,7 +6,6 @@ import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/data/repository/story_repository_impl.dart';
-import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
 @injectable
 class UsersBloc {
@@ -21,22 +20,26 @@ class UsersBloc {
 
   Stream<List<UserModel>> get getContacts => _contactsFetcher.stream;
 
-  Stream<List<UserModel>> get getContactsWithStory => _contactsWithStoryFetcher.stream;
+  Stream<List<UserModel>> get getContactsWithStory =>
+      _contactsWithStoryFetcher.stream;
 
-  initUsers() async{
-    var firestoreDB = Firestore.instance;
+  initUsers() async {
+    var firestoreDB = FirebaseFirestore.instance;
     storyInteractor.initStories();
-    await firestoreDB.collection('users').getDocuments().then((value) => {
-      value.documents.forEach((element) {
-        DatabaseProvider.db.insertData('users', element.data);
-      }),
-    });
+    await firestoreDB.collection('users').get().then((value) => {
+          value.docs.forEach((element) {
+            DatabaseProvider.db.insertData('users', element.data());
+          }),
+        });
 
     await userInteractor.getCurrentUserId();
   }
 
   fetchCurrentUser() async {
-    var userId = userInteractor.getCurrentUser().userId;
+    var userId = userInteractor.getCurrentUser()?.userId;
+    if (userId == null) {
+      throw Exception('Empty user Id');
+    }
     var user = await userInteractor.getUser(userId);
     _userFetcher.sink.add(user);
   }
@@ -49,8 +52,8 @@ class UsersBloc {
   fetchContacts() async {
     var currentUserId;
     var contacts = <UserModel>[];
-    if(userInteractor.getCurrentUser() != null){
-      currentUserId = userInteractor.getCurrentUser().userId;
+    if (userInteractor.getCurrentUser() != null) {
+      currentUserId = userInteractor.getCurrentUser()?.userId;
       contacts = await DatabaseProvider.db.getContacts(currentUserId);
     }
     _contactsFetcher.sink.add(contacts);

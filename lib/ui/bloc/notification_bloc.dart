@@ -6,13 +6,12 @@ import 'package:unites_flutter/domain/interactors/notification_interactor.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/notification_model.dart';
-import 'package:unites_flutter/data/repository/notification_repository_impl.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
 @singleton
 @injectable
 class NotificationBloc {
-  var firestore = Firestore.instance;
+  var firestore = FirebaseFirestore.instance;
   var userRepository = getIt<UserRepositoryImpl>();
   var notificationInteractor = getIt<NotificationInteractor>();
   var countNotification = 0;
@@ -42,7 +41,7 @@ class NotificationBloc {
   }
 
   Future<void> setNotificationsAsRead() async {
-    await notificationInteractor.setNotificationsAsRead();
+    notificationInteractor.setNotificationsAsRead();
     getUnreadNotification();
   }
 
@@ -50,14 +49,17 @@ class NotificationBloc {
     var currentUserId = await userRepository.getCurrentUserId();
     firestore
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('notifications')
         .snapshots()
         .listen((event) {
-      event.documentChanges.forEach((element) async {
+      event.docChanges.forEach((element) async {
         if (element.type == DocumentChangeType.modified) {
-          await DatabaseProvider.db.insertData('notifications',
-              NotificationModel.fromJson(element.document.data).toMap());
+          await DatabaseProvider.db.insertData(
+              'notifications',
+              NotificationModel.fromJson(
+                      element.doc.data() as Map<String, dynamic>)
+                  .toMap());
           getNotifications();
           getUnreadNotification();
         }

@@ -2,18 +2,14 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:unites_flutter/domain/interactors/event_interactor.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
-import 'package:unites_flutter/domain/models/comment_model.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
-import 'package:unites_flutter/domain/models/event_with_members.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
-import 'package:unites_flutter/data/repository/event_repository_impl.dart';
 
 @injectable
 class EventsBloc {
@@ -76,17 +72,17 @@ class EventsBloc {
   }
 
   void addEventsListener() async {
-    var firestoreDB = Firestore.instance;
+    var firestoreDB = FirebaseFirestore.instance;
     firestoreDB.collection('events').snapshots().listen((event) {
-      event.documentChanges.forEach((element) async {
+      event.docChanges.forEach((element) async {
         if (element.type == DocumentChangeType.added) {
-          var event = EventModel.fromJson(element.document.data);
+          var event = EventModel.fromJson(element.doc.data() as Map<String, dynamic>);
           await DatabaseProvider.db.insertData('events', event.toMap());
           inAddEvent.add(event);
           getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
-          var event = EventModel.fromJson(element.document.data);
-          await DatabaseProvider.db.deleteEvent(event.id);
+          var event = EventModel.fromJson(element.doc.data() as Map<String, dynamic>);
+          DatabaseProvider.db.deleteEvent(event.id);
           getEvents();
           getMyEventsWithParticipants();
         }
@@ -100,22 +96,22 @@ class EventsBloc {
   }
 
   void addParticipantsListener() async {
-    var firestoreDB = Firestore.instance;
+    var firestoreDB = FirebaseFirestore.instance;
     firestoreDB
         .collectionGroup('participants')
         .snapshots()
         .listen((participant) {
-      participant.documentChanges.forEach((element) async {
+      participant.docChanges.forEach((element) async {
         if (element.type == DocumentChangeType.modified) {
-          var participant = ParticipantsModel.fromJson(element.document.data);
+          var participant = ParticipantsModel.fromJson(element.doc.data() as Map<String, dynamic>); //TODO("Test this if correct transformation")
           await DatabaseProvider.db
               .insertData('participants', participant.toJson());
           getEventWithParticipants(participant.eventId);
           getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
           print('listener removed');
-          var participant = ParticipantsModel.fromJson(element.document.data);
-          await DatabaseProvider.db
+          var participant = ParticipantsModel.fromJson(element.doc.data() as Map<String, dynamic>);
+          DatabaseProvider.db
               .deleteParticipant(participant.eventId, participant.userId);
           getEventWithParticipants(participant.eventId);
           getMyEventsWithParticipants();
@@ -136,7 +132,7 @@ class EventsBloc {
   }
 
   sendComment(String text, String eventId) async {
-    await _eventInteractor.addNewComment(text, eventId);
+    _eventInteractor.addNewComment(text, eventId);
     getEventCommetns(eventId);
   }
 
@@ -146,11 +142,11 @@ class EventsBloc {
   }
 
   joinEvent(String eventId) async {
-    await _eventInteractor.joinEvent(eventId);
+    _eventInteractor.joinEvent(eventId);
   }
 
   leftEvent(String eventId) async {
-    await _eventInteractor.leftEvent(eventId);
+    _eventInteractor.leftEvent(eventId);
   }
 
 //  bool isMember(String eventId) {
