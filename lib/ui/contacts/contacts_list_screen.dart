@@ -1,16 +1,8 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mime/mime.dart';
-import 'package:path/path.dart';
 import 'package:unites_flutter/ui/main.dart';
-import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/ui/bloc/story_bloc.dart';
 import 'package:unites_flutter/ui/bloc/user_bloc.dart';
-import 'package:unites_flutter/domain/models/story_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 import 'package:unites_flutter/ui/profile/edit_profile_screen.dart';
@@ -54,8 +46,8 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 AsyncSnapshot<List<UserModel>> snapshot) {
               Widget child;
               if (snapshot.hasData) {
-                var users = List.of(snapshot.data);
-                if (snapshot.data.contains(userRepository.currentUser)) {
+                var users = List.of(snapshot.data!);
+                if (snapshot.data!.contains(userRepository.currentUser)) {
                   users.remove(userRepository.currentUser);
                 }
                 child = ListView.builder(
@@ -67,7 +59,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                           ? userRepository.currentUser
                           : users[index - 1];
                       usersToSend.add(user);
-                      return index == 0 && !snapshot.data.contains(user)
+                      return index == 0 && !snapshot.data!.contains(user)
                           ? Padding(
                               padding: const EdgeInsets.only(
                                   top: 12.0, bottom: 8.0, right: 10.0),
@@ -96,7 +88,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                                   height: 300,
                                                   child: user.avatar != null
                                                       ? Image.network(
-                                                          user.avatar,
+                                                          user.avatar!,
                                                           fit: BoxFit.cover,
                                                         )
                                                       : Center(
@@ -147,7 +139,9 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    StoryScreen(user: user, users: usersToSend)));
+                                                    StoryScreen(
+                                                        user: user,
+                                                        users: usersToSend)));
                                       },
                                       child: Column(
                                         children: [
@@ -176,7 +170,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                                     height: 300,
                                                     child: user.avatar != null
                                                         ? Image.network(
-                                                            user.avatar,
+                                                            user.avatar!,
                                                             fit: BoxFit.cover,
                                                           )
                                                         : Center(
@@ -231,9 +225,9 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                 AsyncSnapshot<List<UserModel>> snapshot) {
               Widget child;
               var bufferWidgets = <Widget>[];
-              if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                bufferWidgets.add(buildStoriesList(snapshot.data));
-                snapshot.data.forEach((element) {
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                bufferWidgets.add(buildStoriesList(snapshot.data!));
+                snapshot.data!.forEach((element) {
                   bufferWidgets.add(GestureDetector(
                       onTap: () => Navigator.push(
                           context,
@@ -255,7 +249,7 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                                       width: 50,
                                       height: 50,
                                       child: element.avatar != null
-                                          ? Image.network(element.avatar,
+                                          ? Image.network(element.avatar!,
                                               fit: BoxFit.cover)
                                           : Center(
                                               child: Text(

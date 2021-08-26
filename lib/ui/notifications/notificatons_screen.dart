@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:unites_flutter/ui/main.dart';
-import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/ui/bloc/notification_bloc.dart';
-import 'package:unites_flutter/domain/models/event_model.dart';
 import 'package:unites_flutter/domain/models/notification_model.dart';
 import 'package:unites_flutter/domain/models/notification_state.dart';
 import 'package:unites_flutter/ui/events/event_info_screen.dart';
 import 'package:unites_flutter/ui/profile/userInfo_screen.dart';
+
 class NotificationScreen extends StatefulWidget {
   @override
   _NotificationScreenState createState() => _NotificationScreenState();
@@ -41,17 +40,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 AsyncSnapshot<List<NotificationModel>> snapshot) {
               Widget child;
               var bufferWidgets = <Widget>[];
-              if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                if (snapshot.data.firstWhere(
-                        (element) => element.seenByMe == false,
-                        orElse: () => null) !=
-                    null) {
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                if (snapshot.data!
+                        .firstWhere((element) => element.seenByMe == false) != null) {
                   bufferWidgets.add(Padding(
                     padding:
                         const EdgeInsets.only(left: 12.0, top: 12, bottom: 8),
                     child: Text('Новые'),
                   ));
-                  snapshot.data.forEach((element) {
+                  snapshot.data!.forEach((element) {
                     print('element ${element.seenByMe}');
                     if (element.seenByMe == false) {
                       bufferWidgets.add(Padding(
@@ -70,7 +67,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         const EdgeInsets.only(left: 12.0, top: 12, bottom: 8),
                     child: Text('Просмотренные'),
                   ));
-                  snapshot.data.forEach((element) {
+                  snapshot.data!.forEach((element) {
                     if (element.seenByMe == true) {
                       bufferWidgets.add(Padding(
                           padding: EdgeInsets.only(left: 6, right: 6, top: 4),
@@ -84,7 +81,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     }
                   });
                 } else {
-                  snapshot.data.forEach((element) {
+                  snapshot.data!.forEach((element) {
                     bufferWidgets.add(Padding(
                         padding: EdgeInsets.only(left: 6, right: 6, top: 4),
                         child: Card(
@@ -145,23 +142,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return res;
   }
 
-
-  void navigateFromNotification(NotificationModel notification, BuildContext context){
-    if (notification.state ==
-        NotificationState.EVENT_CHANGED ||
-        notification.state ==
-            NotificationState.EVENT_NEW_COMMENT) {
+  void navigateFromNotification(
+      NotificationModel notification, BuildContext context) {
+    if (notification.state == NotificationState.EVENT_CHANGED ||
+        notification.state == NotificationState.EVENT_NEW_COMMENT) {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => EventInfoScreen(
-                  eventId: notification.eventId)));
+              builder: (context) =>
+                  EventInfoScreen(eventId: notification.eventId)));
     } else {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UserInfoScreen(
-                  userId: notification.initiatorId)));
+              builder: (context) =>
+                  UserInfoScreen(userId: notification.initiatorId)));
     }
   }
 }

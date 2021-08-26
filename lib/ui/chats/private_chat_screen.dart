@@ -1,13 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:unites_flutter/ui/app.dart';
 import 'package:unites_flutter/ui/bloc/chat_bloc.dart';
 import 'package:unites_flutter/domain/models/message_model.dart';
 
 class PrivateChatScreen extends StatefulWidget {
   String userId;
 
-  PrivateChatScreen({@required this.userId});
+  PrivateChatScreen({required this.userId});
 
   @override
   _PrivateChatScreenState createState() => _PrivateChatScreenState();
@@ -34,6 +32,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
         title: Text('Приватный чат'),
       ),
       body: WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
         child: Stack(
           children: <Widget>[
             Column(
@@ -48,7 +49,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.black)));
                       } else {
-                        listMessage = snapshot.data;
+                        listMessage = snapshot.data!;
 //                        listMessage.sort((MessageModel a, MessageModel b) => b.createdAt.compareTo(a.createdAt));
                         return ListView.builder(
                           padding: EdgeInsets.all(10.0),
@@ -63,6 +64,12 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                   ),
                 ),
                 Container(
+                  width: double.infinity,
+                  height: 50.0,
+                  decoration: BoxDecoration(
+                      border: Border(
+                          top: BorderSide(color: Colors.grey, width: 0.5)),
+                      color: Colors.white),
                   child: Row(
                     children: <Widget>[
                       // Button send image
@@ -83,6 +90,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
 
                       // Button send message
                       Material(
+                        color: Colors.white,
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 8.0),
                           child: IconButton(
@@ -95,16 +103,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                             color: Colors.blueAccent,
                           ),
                         ),
-                        color: Colors.white,
                       ),
                     ],
                   ),
-                  width: double.infinity,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          top: BorderSide(color: Colors.grey, width: 0.5)),
-                      color: Colors.white),
                 ),
               ],
             ),
@@ -122,28 +123,28 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
             Align(
                 alignment: Alignment.centerRight,
                 child: Container(
-                  child: Text(
-                    message.text,
-                    style: TextStyle(color: Colors.white),
-                  ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   decoration: BoxDecoration(
                       color: Colors.white10,
                       borderRadius: BorderRadius.circular(8.0)),
                   margin: EdgeInsets.only(bottom: 10.0, left: 50.0),
+                  child: Text(
+                    message.text,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ))
           ])
         : Wrap(children: [
             Container(
-              child: Text(
-                message.text,
-                style: TextStyle(color: Colors.white),
-              ),
               padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
               decoration: BoxDecoration(
                   color: Colors.black26,
                   borderRadius: BorderRadius.circular(8.0)),
               margin: EdgeInsets.only(left: 10.0, bottom: 10.0),
+              child: Text(
+                message.text,
+                style: TextStyle(color: Colors.white),
+              ),
             )
           ]);
   }
