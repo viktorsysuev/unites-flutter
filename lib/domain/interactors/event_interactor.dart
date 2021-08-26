@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
@@ -9,7 +8,6 @@ import 'package:unites_flutter/domain/repository/event_repository.dart';
 
 @injectable
 class EventInteractor {
-
   EventInteractor(this.eventRepository);
 
   EventRepository eventRepository;

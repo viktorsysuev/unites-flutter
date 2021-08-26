@@ -4,9 +4,6 @@ import 'package:unites_flutter/domain/models/event_with_participants.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 
-
-
-
 abstract class EventRepository {
   Future<List<EventModel>> initEvents();
 
@@ -37,5 +34,4 @@ abstract class EventRepository {
   Future<List<ParticipantsModel>> getEventParticipants(String eventId);
 
   Future<bool> isParticipant(String eventId);
-
 }
