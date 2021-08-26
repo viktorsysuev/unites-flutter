@@ -8,12 +8,9 @@ import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/user_bloc.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
-import 'package:unites_flutter/ui/notifications/notificatons_screen.dart';
-
-import '../home.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen({Key key}) : super(key: key);
+  EditProfileScreen({Key? key}) : super(key: key);
 
   static Color colorById(String id) {
     var colors = [
@@ -45,8 +42,8 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   var userRepository = getIt<UserRepositoryImpl>();
   final userBloc = getIt<UsersBloc>();
 
-  File _image;
-  String avatarUrl;
+  File? _image;
+  String? avatarUrl;
 
   @override
   void didChangeDependencies() {
@@ -61,10 +58,10 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   }
 
   Future getImage() async {
-    var image = await ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 85);
+    var image = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 85);
     setState(() {
-      _image = image;
+      // _image = image;
     });
   }
 
@@ -98,10 +95,10 @@ class _EditProfileScreen extends State<EditProfileScreen> {
 
     if (_image != null) {
       _onLoading(context);
-      var fileName = basename(_image.path);
+      var fileName = basename(_image!.path);
       var firebaseStorage = FirebaseStorage.instance.ref().child(fileName);
-      var task = await firebaseStorage.putFile(_image);
-      await task.onComplete;
+      var task = await firebaseStorage.putFile(_image!);
+      // await task.onComplete;
       var url = await firebaseStorage.getDownloadURL();
       avatarUrl = url;
       user.avatar = avatarUrl;
@@ -122,13 +119,13 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           stream: userBloc.getUser,
           builder: (BuildContext context, AsyncSnapshot<UserModel> snapshot) {
             if (snapshot.hasData) {
-              firstNameController.text = '${snapshot.data.firstName}';
-              lastNameController.text = '${snapshot.data.lastName}';
-              aboutController.text = '${snapshot.data.aboutMe}';
-              interestsController.text = '${snapshot.data.interests}';
-              companyController.text = '${snapshot.data.company}';
-              usefulController.text = '${snapshot.data.useful}';
-              avatarUrl = snapshot.data.avatar;
+              firstNameController.text = '${snapshot.data?.firstName}';
+              lastNameController.text = '${snapshot.data?.lastName}';
+              aboutController.text = '${snapshot.data?.aboutMe}';
+              interestsController.text = '${snapshot.data?.interests}';
+              companyController.text = '${snapshot.data?.company}';
+              usefulController.text = '${snapshot.data?.useful}';
+              avatarUrl = snapshot.data?.avatar;
               return buildInfo(snapshot, context);
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString());
@@ -149,23 +146,25 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         },
         child: CircleAvatar(
           radius: 84,
-          backgroundColor: EditProfileScreen.colorById(snapshot.data.userId),
+          backgroundColor: EditProfileScreen.colorById(snapshot.data!.userId),
           child: Stack(
             children: [
               Visibility(
-                child: Text('${snapshot.data.firstName[0]}${snapshot.data.lastName[0]}',
-                  style: TextStyle(fontSize: 44, color: Colors.white), textAlign: TextAlign.center),
                 maintainSize: true,
                 maintainAnimation: true,
                 maintainState: true,
-                visible: _image == null && snapshot.data.avatar == null,
+                visible: _image == null && snapshot.data!.avatar == null,
+                child: Text(
+                    '${snapshot.data?.firstName[0]}${snapshot.data?.lastName[0]}',
+                    style: TextStyle(fontSize: 44, color: Colors.white),
+                    textAlign: TextAlign.center),
               ),
-              if (snapshot.data.avatar != null)
+              if (snapshot.data!.avatar != null)
                 ClipOval(
                     child: SizedBox(
                         width: 300,
                         height: 300,
-                        child: Image.network(snapshot.data.avatar,
+                        child: Image.network(snapshot.data!.avatar!,
                             fit: BoxFit.cover))),
               if (_image != null)
                 ClipOval(
@@ -173,7 +172,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                         width: 300,
                         height: 300,
                         child: Image.file(
-                          _image,
+                          _image!,
                           fit: BoxFit.cover,
                         )))
             ],
@@ -192,7 +191,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Введите имя';
             }
             return null;
@@ -211,7 +210,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Введите фамилию';
             }
             return null;
@@ -230,7 +229,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Напишите информацию о себе';
             }
             return null;
@@ -249,7 +248,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Заполните поле';
             }
             return null;
@@ -268,7 +267,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Заполните поле';
             }
             return null;
@@ -287,7 +286,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           // The validator receives the text that the user has entered.
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Заполните поле';
             }
             return null;
@@ -310,5 +309,4 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           )),
     ])));
   }
-
 }

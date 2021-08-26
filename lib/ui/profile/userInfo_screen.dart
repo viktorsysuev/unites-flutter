@@ -10,7 +10,7 @@ import 'edit_profile_screen.dart';
 class UserInfoScreen extends StatefulWidget {
   String userId;
 
-  UserInfoScreen({@required this.userId});
+  UserInfoScreen({required this.userId});
 
   @override
   _UserInfoScreenState createState() => _UserInfoScreenState();
@@ -19,7 +19,6 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   var userRepository = getIt<UserRepositoryImpl>();
   final userBloc = getIt<UsersBloc>();
-
 
   @override
   void didChangeDependencies() {
@@ -60,19 +59,19 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
           Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
           CircleAvatar(
             radius: 84,
-            backgroundColor: EditProfileScreen.colorById(snapshot.data.userId),
+            backgroundColor: EditProfileScreen.colorById(snapshot.data!.userId),
             child: ClipOval(
               child: SizedBox(
                 width: 300,
                 height: 300,
-                child: snapshot.data.avatar != null
+                child: snapshot.data!.avatar != null
                     ? Image.network(
-                        snapshot.data.avatar,
+                        snapshot.data!.avatar!,
                         fit: BoxFit.cover,
                       )
                     : Center(
                         child: Text(
-                            '${snapshot.data.firstName[0]}${snapshot.data.lastName[0]}',
+                            '${snapshot.data!.firstName[0]}${snapshot.data!.lastName[0]}',
                             style: TextStyle(fontSize: 44, color: Colors.white),
                             textAlign: TextAlign.center)),
               ),
@@ -80,44 +79,46 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
           ),
           Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
           Center(
-            child: Text('${snapshot.data.firstName} ${snapshot.data.lastName}',
+            child: Text(
+                '${snapshot.data!.firstName} ${snapshot.data!.lastName}',
                 style: TextStyle(fontSize: 22.0)),
           ),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: Text('${snapshot.data.aboutMe}',
+                child: Text('${snapshot.data!.aboutMe}',
                     style: TextStyle(fontSize: 16.0)),
               )),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Center(
-            child: Text('${snapshot.data.company}',
+            child: Text('${snapshot.data!.company}',
                 style: TextStyle(fontSize: 16.0)),
           ),
           Padding(
             padding: EdgeInsets.all(24.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('Я ищу (каких людей/услуги/товары):',
-                  style:
-                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('${snapshot.data.interests}',
-                  style: TextStyle(fontSize: 16.0)),
-              Container(margin: EdgeInsets.only(top: 16.0)),
-              Text('Чем могу быть полезен:',
-                  style:
-                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('${snapshot.data.useful}', style: TextStyle(fontSize: 16.0)),
-              Container(margin: EdgeInsets.only(top: 16.0)),
-              Text('Телефон: ${snapshot.data.phone}',
-                  style:
-                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-            ]),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('Я ищу (каких людей/услуги/товары):',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('${snapshot.data!.interests}',
+                      style: TextStyle(fontSize: 16.0)),
+                  Container(margin: EdgeInsets.only(top: 16.0)),
+                  Text('Чем могу быть полезен:',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('${snapshot.data!.useful}',
+                      style: TextStyle(fontSize: 16.0)),
+                  Container(margin: EdgeInsets.only(top: 16.0)),
+                  Text('Телефон: ${snapshot.data!.phone}',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold)),
+                ]),
           ),
           Container(margin: EdgeInsets.only(top: 10.0, bottom: 10.0)),
           Center(
@@ -129,7 +130,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            PrivateChatScreen(userId: snapshot.data.userId)));
+                            PrivateChatScreen(userId: snapshot.data!.userId)));
               },
             ),
           ),

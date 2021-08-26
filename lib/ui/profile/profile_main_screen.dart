@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/user_bloc.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
@@ -90,19 +88,19 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
           Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
           CircleAvatar(
             radius: 84,
-            backgroundColor: EditProfileScreen.colorById(snapshot.data.userId),
+            backgroundColor: EditProfileScreen.colorById(snapshot.data!.userId),
             child: ClipOval(
               child: SizedBox(
                 width: 300,
                 height: 300,
-                child: snapshot.data.avatar != null
+                child: snapshot.data!.avatar != null
                     ? Image.network(
-                        snapshot.data.avatar,
+                        snapshot.data!.avatar!,
                         fit: BoxFit.cover,
                       )
                     : Center(
                         child: Text(
-                            '${snapshot.data.firstName[0]}${snapshot.data.lastName[0]}',
+                            '${snapshot.data!.firstName[0]}${snapshot.data!.lastName[0]}',
                             style: TextStyle(fontSize: 44, color: Colors.white),
                             textAlign: TextAlign.center)),
               ),
@@ -110,53 +108,57 @@ class ProfileMainScreenState extends State<ProfileMainScreen> {
           ),
           Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
           Center(
-            child: Text('${snapshot.data.firstName} ${snapshot.data.lastName}',
+            child: Text(
+                '${snapshot.data!.firstName} ${snapshot.data!.lastName}',
                 style: TextStyle(fontSize: 22.0)),
           ),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: Text('${snapshot.data.aboutMe}',
+                child: Text('${snapshot.data!.aboutMe}',
                     style: TextStyle(fontSize: 16.0)),
               )),
           Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
           Center(
-            child: Text('${snapshot.data.company}',
+            child: Text('${snapshot.data!.company}',
                 style: TextStyle(fontSize: 16.0)),
           ),
           Padding(
             padding: EdgeInsets.only(left: 12.0, right: 12.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('Я ищу (каких людей/услуги/товары):',
-                  style:
-                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('${snapshot.data.interests}',
-                  style: TextStyle(fontSize: 16.0)),
-              Container(margin: EdgeInsets.only(top: 16.0)),
-              Text('Чем могу быть полезен:',
-                  style:
-                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-              Container(margin: EdgeInsets.only(top: 8.0)),
-              Text('${snapshot.data.useful}', style: TextStyle(fontSize: 16.0)),
-            ]),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('Я ищу (каких людей/услуги/товары):',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('${snapshot.data!.interests}',
+                      style: TextStyle(fontSize: 16.0)),
+                  Container(margin: EdgeInsets.only(top: 16.0)),
+                  Text('Чем могу быть полезен:',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  Container(margin: EdgeInsets.only(top: 8.0)),
+                  Text('${snapshot.data!.useful}',
+                      style: TextStyle(fontSize: 16.0)),
+                ]),
           ),
           Row(
             children: [
               Container(padding: EdgeInsets.only(left: 12.0)),
-              Text('Ночной режим', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+              Text('Ночной режим',
+                  style:
+                      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
               Container(padding: EdgeInsets.only(left: 8.0)),
               Switch(
                   value: ThemeController.of(context).currentTheme == 'dark',
                   onChanged: (bool newValue) {
                     setState(() {
-                      if(newValue == true){
+                      if (newValue == true) {
                         ThemeController.of(context).setTheme('dark');
-                      } else{
+                      } else {
                         ThemeController.of(context).setTheme('light');
                       }
                     });
