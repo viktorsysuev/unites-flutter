@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 import 'package:unites_flutter/ui/auth/input_code_screen.dart';
-import 'package:unites_flutter/ui/auth/registration_screen.dart';
-import 'package:unites_flutter/ui/profile/edit_profile_screen.dart';
-
-import '../home.dart';
 
 class InputPhoneNumberScreen extends StatefulWidget {
   @override
@@ -17,15 +12,8 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _phoneController = TextEditingController();
-  final _codeController = TextEditingController();
 
   var userRepository = getIt<UserRepositoryImpl>();
-
-  String _phone;
-  String _errorMessage;
-
-  bool _isLoginForm;
-  bool _isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +40,7 @@ class _InputPhoneNumberScreen extends State<InputPhoneNumberScreen> {
                 color: Colors.grey,
               )),
           validator: (value) {
-            if (value.isEmpty) {
+            if (value == null || value.isEmpty) {
               return 'Введите номер';
             }
             return null;

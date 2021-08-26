@@ -9,7 +9,7 @@ import 'registration_screen.dart';
 class InputCodeScreen extends StatefulWidget {
   String phoneNumber;
 
-  InputCodeScreen({@required this.phoneNumber});
+  InputCodeScreen({required this.phoneNumber});
 
   @override
   _InputCodeScreenState createState() => _InputCodeScreenState();
@@ -23,7 +23,7 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
   var progressVisible = false;
   final _formKey = GlobalKey<FormState>();
 
-  String _code;
+  String _code = '';
 
   @override
   void didChangeDependencies() {
@@ -35,85 +35,87 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
     loginUser(widget.phoneNumber, context);
     return Scaffold(
         body: Form(
-        key: _formKey,
-        child: Container(
-      alignment: Alignment.bottomCenter,
-      margin: EdgeInsets.only(top: 160),
-      padding: EdgeInsets.all(12.0),
-      child: Column(
-        children: [
-          Text('Введите код',
-              textAlign: TextAlign.center, style: TextStyle(fontSize: 22)),
-          Container(padding: EdgeInsets.only(top: 12.0)),
-          Text(
-              'Мы отправили СМС с проверочным кодом на Ваш телефон ${widget.phoneNumber}',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey)),
-          Container(padding: EdgeInsets.only(top: 12.0)),
-          TextFormField(
-            controller: _codeController,
-            maxLines: 1,
-            keyboardType: TextInputType.number,
-            autofocus: false,
-            decoration: InputDecoration(hintText: 'Проверочный код'),
-            validator: (value) =>
-                value.isEmpty ? 'Поле не может быть пустым' : null,
-            onSaved: (value) => _code = value.trim(),
-          ),
-          Container(padding: EdgeInsets.only(top: 12.0)),
-          RaisedButton(
-            elevation: 5.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0)),
-            color: Colors.blue,
-            child: Text('Подтвердить',
-                style: TextStyle(fontSize: 20.0, color: Colors.white)),
-            onPressed: () async {
-              setState(() {
-                progressVisible = true;
-              });
-              final code = _codeController.text.trim();
-              var credential = PhoneAuthProvider.getCredential(
-                  verificationId: _verificationId, smsCode: code);
+            key: _formKey,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              margin: EdgeInsets.only(top: 160),
+              padding: EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  Text('Введите код',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 22)),
+                  Container(padding: EdgeInsets.only(top: 12.0)),
+                  Text(
+                      'Мы отправили СМС с проверочным кодом на Ваш телефон ${widget.phoneNumber}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  Container(padding: EdgeInsets.only(top: 12.0)),
+                  TextFormField(
+                    controller: _codeController,
+                    maxLines: 1,
+                    keyboardType: TextInputType.number,
+                    autofocus: false,
+                    decoration: InputDecoration(hintText: 'Проверочный код'),
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Поле не может быть пустым'
+                        : null,
+                    onSaved: (value) => _code = value?.trim() ?? '',
+                  ),
+                  Container(padding: EdgeInsets.only(top: 12.0)),
+                  RaisedButton(
+                    elevation: 5.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0)),
+                    color: Colors.blue,
+                    onPressed: () async {
+                      setState(() {
+                        progressVisible = true;
+                      });
+                      final code = _codeController.text.trim();
+                      var credential = PhoneAuthProvider.credential(
+                          verificationId: _verificationId, smsCode: code);
 
-              var result = await _auth.signInWithCredential(credential);
+                      var result = await _auth.signInWithCredential(credential);
 
-              var user = result.user;
+                      var user = result.user;
 
-              if (user != null) {
-                final userExist = await userRepository.isUserExist();
-                if (userExist) {
-                  print('navigate to home');
-                  await Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => Home()),
-                      (Route<dynamic> route) => false);
-                } else {
-                  await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RegistrationScreen()));
-                }
-              } else {
-                print("Error");
-              }
-            },
-          ),
-          Container(padding: EdgeInsets.only(top: 12.0)),
-          Visibility(
-              visible: progressVisible,
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Wrap(children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Colors.blue),
-                    )
-                  ]))),
-        ],
-      ),
-    )));
+                      if (user != null) {
+                        final userExist = await userRepository.isUserExist();
+                        if (userExist) {
+                          print('navigate to home');
+                          await Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => Home()),
+                              (Route<dynamic> route) => false);
+                        } else {
+                          await Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegistrationScreen()));
+                        }
+                      } else {
+                        print('Error');
+                      }
+                    },
+                    child: Text('Подтвердить',
+                        style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  ),
+                  Container(padding: EdgeInsets.only(top: 12.0)),
+                  Visibility(
+                      visible: progressVisible,
+                      child: Align(
+                          alignment: Alignment.center,
+                          child: Wrap(children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.blue),
+                            )
+                          ]))),
+                ],
+              ),
+            )));
   }
 
-  Future<bool> loginUser(String phone, BuildContext context) async {
+  void loginUser(String phone, BuildContext context) async {
     await _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
@@ -136,12 +138,12 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
             print('Error');
           }
         },
-        verificationFailed: (AuthException exception) {
+        verificationFailed: (FirebaseAuthException exception) {
           print(exception.message);
         },
-        codeSent: (String verificationId, [int forceResendingToken]) {
+        codeSent: (String verificationId, [int? forceResendingToken]) {
           _verificationId = verificationId;
         },
-        codeAutoRetrievalTimeout: null);
+        codeAutoRetrievalTimeout: (String verificationId) {});
   }
 }

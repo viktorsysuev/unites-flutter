@@ -14,7 +14,7 @@ class IntroScreen extends StatelessWidget {
   }
 
   void getUser(BuildContext context) async {
-    final user = await _auth.currentUser();
+    final user = _auth.currentUser;
     if (user != null) {
       await Navigator.pushReplacement(
         context,

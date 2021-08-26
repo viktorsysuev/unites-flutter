@@ -6,7 +6,7 @@ import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 import '../home.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  RegistrationScreen({Key key}) : super(key: key);
+  RegistrationScreen({Key? key}) : super(key: key);
 
   @override
   _RegistrationScreen createState() => _RegistrationScreen();
@@ -40,7 +40,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Введите имя';
                 }
                 return null;
@@ -59,7 +59,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Введите фамилию';
                 }
                 return null;
@@ -78,7 +78,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Напишите информацию о себе';
                 }
                 return null;
@@ -97,7 +97,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Заполните поле';
                 }
                 return null;
@@ -116,7 +116,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Заполните поле';
                 }
                 return null;
@@ -135,7 +135,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               ),
               // The validator receives the text that the user has entered.
               validator: (value) {
-                if (value.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Заполните поле';
                 }
                 return null;
