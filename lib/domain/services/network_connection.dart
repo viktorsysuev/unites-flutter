@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 class NetworkConnection {
   BuildContext context;
 
-  NetworkConnection({@required this.context});
+  NetworkConnection({required this.context});
 
-  bool networkConnection;
-  Connectivity _connectivity;
-  StreamSubscription<ConnectivityResult> _subscription;
+  bool networkConnection = false;
+  Connectivity? _connectivity;
+  StreamSubscription<ConnectivityResult>? _subscription;
+
   final lostConnectionSnackBar = SnackBar(
       backgroundColor: Colors.red,
       content: Row(
@@ -42,14 +43,15 @@ class NetworkConnection {
 
   checkConnect() async {
     _connectivity = new Connectivity();
-    _subscription = _connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
-          print("result $result");
+    _subscription = _connectivity?.onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      print("result $result");
       if (result == ConnectivityResult.none) {
         Scaffold.of(context).showSnackBar(lostConnectionSnackBar);
         networkConnection = false;
         print('NO INTERNET');
       } else {
-        if(networkConnection != null) {
+        if (networkConnection != null) {
           Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(returnConnectionSnackBar);
         }
@@ -74,6 +76,6 @@ class NetworkConnection {
   }
 
   void dispose() {
-    _subscription.cancel();
+    _subscription?.cancel();
   }
 }
