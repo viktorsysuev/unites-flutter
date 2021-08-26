@@ -7,10 +7,9 @@ import 'package:unites_flutter/domain/models/chat_model.dart';
 import 'package:unites_flutter/domain/models/message_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
-
 @injectable
 class ChatRepositoryImpl implements ChatRepository {
-  final db = Firestore.instance;
+  final db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   var userRepository = getIt<UserRepositoryImpl>();
 
@@ -36,50 +35,50 @@ class ChatRepositoryImpl implements ChatRepository {
 
     await db
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('chats')
         .add(newChat.toJson())
         .then((value) => {
-              newChat.chatId = value.documentID,
+              newChat.chatId = value.id,
               db
                   .collection('users')
-                  .document(currentUserId)
+                  .doc(currentUserId)
                   .collection('chats')
-                  .document(value.documentID)
-                  .updateData(newChat.toJson())
+                  .doc(value.id)
+                  .update(newChat.toJson())
                   .whenComplete(() => {
-                        newMessage.chatId = value.documentID,
+                        newMessage.chatId = value.id,
                         value
                             .collection('messages')
                             .add(newMessage.toJson())
                             .then((value) => {
-                                  newMessage.messageId = value.documentID,
-                                  value.updateData(newMessage.toJson())
+                                  newMessage.messageId = value.id,
+                                  value.update(newMessage.toJson())
                                 })
                       })
             });
 
     await db
         .collection('users')
-        .document(userId)
+        .doc(userId)
         .collection('chats')
         .add(newClientChat.toJson())
         .then((value) => {
-              newClientChat.chatId = value.documentID,
+              newClientChat.chatId = value.id,
               db
                   .collection('users')
-                  .document(userId)
+                  .doc(userId)
                   .collection('chats')
-                  .document(value.documentID)
-                  .updateData(newClientChat.toJson())
+                  .doc(value.id)
+                  .update(newClientChat.toJson())
                   .whenComplete(() => {
-                        newClientMessage.chatId = value.documentID,
+                        newClientMessage.chatId = value.id,
                         value
                             .collection('messages')
                             .add(newClientMessage.toJson())
                             .then((value) => {
-                                  newClientMessage.messageId = value.documentID,
-                                  value.updateData(newClientMessage.toJson())
+                                  newClientMessage.messageId = value.id,
+                                  value.update(newClientMessage.toJson())
                                 })
                       })
             });
@@ -87,23 +86,23 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<List<MessageModel>> getChatMessages(String userId) async {
-    var messages = List<MessageModel>();
+    var messages = <MessageModel>[];
     var currentUserId = await userRepository.getCurrentUserId();
     var chat = await db
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('chats')
         .where('chatWith', isEqualTo: userId)
-        .getDocuments();
+        .get();
 
-    if (chat.documents.isNotEmpty) {
-      await chat.documents[0].reference
+    if (chat.docs.isNotEmpty) {
+      await chat.docs[0].reference
           .collection('messages')
           .orderBy('createdAt', descending: true)
-          .getDocuments()
+          .get()
           .then((value) => {
-                value.documents.forEach((element) {
-                  messages.add(MessageModel.fromJson(element.data));
+                value.docs.forEach((element) {
+                  messages.add(MessageModel.fromJson(element.data()));
                 })
               });
       print('messages ${messages.length} first ${messages[0].text}');
@@ -127,38 +126,38 @@ class ChatRepositoryImpl implements ChatRepository {
 
     var chat = await db
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('chats')
         .where('chatWith', isEqualTo: userId)
-        .getDocuments();
+        .get();
 
-    if (chat.documents.isNotEmpty) {
-      newMessage.chatId = ChatModel.fromJson(chat.documents[0].data).chatId;
+    if (chat.docs.isNotEmpty) {
+      newMessage.chatId = ChatModel.fromJson(chat.docs[0].data()).chatId;
 
-      print('chat ${ChatModel.fromJson(chat.documents[0].data).chatWith}');
-      await chat.documents[0].reference
+      print('chat ${ChatModel.fromJson(chat.docs[0].data()).chatWith}');
+      await chat.docs[0].reference
           .collection('messages')
           .add(newMessage.toJson())
           .then((value) => {
-                newMessage.messageId = value.documentID,
-                value.updateData(newMessage.toJson())
+                newMessage.messageId = value.id,
+                value.update(newMessage.toJson())
               });
 
       var chatClient = await db
           .collection('users')
-          .document(userId)
+          .doc(userId)
           .collection('chats')
           .where('chatWith', isEqualTo: currentUserId);
 
-      await chatClient.getDocuments().then((value) => {
+      await chatClient.get().then((value) => {
             newClientMessage.chatId =
-                ChatModel.fromJson(value.documents[0].data).chatId,
-            value.documents[0].reference
+                ChatModel.fromJson(value.docs[0].data()).chatId,
+            value.docs[0].reference
                 .collection('messages')
                 .add(newClientMessage.toJson())
                 .then((value) => {
-                      newClientMessage.messageId = value.documentID,
-                      value.updateData(newClientMessage.toJson())
+                      newClientMessage.messageId = value.id,
+                      value.update(newClientMessage.toJson())
                     })
           });
     } else {

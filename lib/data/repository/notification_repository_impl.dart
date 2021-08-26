@@ -8,26 +8,25 @@ import 'package:unites_flutter/domain/models/notification_model.dart';
 import 'package:unites_flutter/domain/models/notification_state.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
-
 @injectable
 class NotificationRepositoryImpl implements NotificationRepository {
-
   NotificationRepositoryImpl(this.userRepository);
 
   UserRepositoryImpl userRepository;
 
-  final firestore = Firestore.instance;
+  final firestore = FirebaseFirestore.instance;
 
   @override
   void initNotifications() async {
     var currentUserId = await userRepository.getCurrentUserId();
     var notifications = await firestore
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('notifications')
-        .getDocuments();
-    notifications.documents.forEach((element) {
-      DatabaseProvider.db.insertData('notifications', NotificationModel.fromJson(element.data).toMap());
+        .get();
+    notifications.docs.forEach((element) {
+      DatabaseProvider.db.insertData(
+          'notifications', NotificationModel.fromJson(element.data()).toMap());
     });
   }
 
@@ -43,16 +42,17 @@ class NotificationRepositoryImpl implements NotificationRepository {
 
   @override
   void setNotificationsAsRead() async {
-    await DatabaseProvider.db.setNotificationsAsRead();
+    DatabaseProvider.db.setNotificationsAsRead();
     var currentUserId = await userRepository.getCurrentUserId();
     await firestore
         .collection('users')
-        .document(currentUserId)
+        .doc(currentUserId)
         .collection('notifications')
-        .getDocuments().then((value) => {
-          value.documents.forEach((element) {
-            element.reference.updateData({'seenByMe': true});
-          })
-    });
+        .get()
+        .then((value) => {
+              value.docs.forEach((element) {
+                element.reference.update({'seenByMe': true});
+              })
+            });
   }
 }

@@ -1,32 +1,28 @@
-import 'dart:async';
-
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:unites_flutter/data/database/create_table.dart';
-import 'package:unites_flutter/domain/models/comment_model.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
-import 'package:unites_flutter/domain/models/event_with_members.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
 import 'package:unites_flutter/domain/models/notification_model.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/story_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 
+import 'create_table.dart';
+
 class DatabaseProvider {
   DatabaseProvider._();
 
   static final db = DatabaseProvider._();
 
-  static Database _database;
+  static Database? _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null) return _database!;
 
     // if _database is null we instantiate it
     _database = await initDatabase();
-    return _database;
+    return _database!;
   }
 
   initDatabase() async {
@@ -34,7 +30,7 @@ class DatabaseProvider {
     var path = join(dbDirectory, 'UnitesDatabase.db');
     return await openDatabase(path, version: 4, onOpen: (db) {},
         onCreate: (Database db, int version) async {
-      await createTables.forEach((name, text) async => await db.execute(text));
+      createTables.forEach((name, text) async => await db.execute(text));
     });
   }
 
@@ -66,7 +62,8 @@ class DatabaseProvider {
 
   Future<List<CommentWithUser>> getEventComments(String eventId) async {
     final db = await database;
-    var res = await db.query("comments_with_users WHERE eventId = '$eventId' ORDER BY createdAt ASC");
+    var res = await db.query(
+        "comments_with_users WHERE eventId = '$eventId' ORDER BY createdAt ASC");
     var comments = <CommentWithUser>[];
     res.forEach((element) {
       comments.add(CommentWithUser.fromDB(element));
@@ -86,9 +83,10 @@ class DatabaseProvider {
 
   Future<int> getUnreadCountNotifications() async {
     final db = await database;
-    var res = await db.rawQuery('SELECT COUNT(*) FROM notifications WHERE seenByMe = 0');
-
-    return res.first.values.first;
+    var res = await db
+        .rawQuery('SELECT COUNT(*) FROM notifications WHERE seenByMe = 0');
+    final r = res.first.values.first;
+    return r as int? ?? 0;
   }
 
   void setNotificationsAsRead() async {
@@ -100,7 +98,7 @@ class DatabaseProvider {
     final db = await database;
     var res = await db.rawQuery(
         "SELECT COUNT(*) FROM participants WHERE userId = '$userId' AND  eventId = '$eventId'");
-    return Sqflite.firstIntValue(res);
+    return Sqflite.firstIntValue(res) ?? 0;
   }
 
   Future<ParticipantsModel> getParticipant(
@@ -128,7 +126,7 @@ class DatabaseProvider {
     final db = await database;
     var stories = <StoryModel>[];
     var res = await db.rawQuery("SELECT * FROM stories");
-    res.forEach((element){
+    res.forEach((element) {
       stories.add(StoryModel.fromDB(element));
     });
     return stories;
@@ -143,7 +141,8 @@ class DatabaseProvider {
   Future<List<UserModel>> getContacts(String userId) async {
     final db = await database;
     var contacts = <UserModel>{};
-    var res = await db.rawQuery("SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
+    var res = await db.rawQuery(
+        "SELECT * FROM users WHERE userId in (SELECT userId FROM participants WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$userId') AND NOT userId = '$userId')");
     res.forEach((element) {
       contacts.add(UserModel.fromJson(element));
     });
@@ -153,7 +152,8 @@ class DatabaseProvider {
   Future<List<UserModel>> getContactsWithStory() async {
     final db = await database;
     var contacts = <UserModel>{};
-    var res = await db.rawQuery('SELECT * FROM users WHERE userId in (SELECT userId FROM stories)');
+    var res = await db.rawQuery(
+        'SELECT * FROM users WHERE userId in (SELECT userId FROM stories)');
     res.forEach((element) {
       contacts.add(UserModel.fromJson(element));
     });
@@ -165,16 +165,17 @@ class DatabaseProvider {
     var result = <EventWithParticipants>[];
     final db = await database;
     var participants = await db.rawQuery('SELECT * FROM participants');
-    var res = await db.rawQuery("SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
+    var res = await db.rawQuery(
+        "SELECT * FROM events WHERE eventId in (SELECT eventId FROM participants WHERE userId = '$currentUserId')");
     await Future.forEach(res, (element) async {
       var newEventWithParticipants = EventWithParticipants();
-      var event = EventModel.fromDB(element);
+      var event = EventModel.fromDB(element as Map<String, dynamic>);
       newEventWithParticipants.eventModel = event;
       var users = <ParticipantsModel>{};
 
       participants.forEach((element) {
         var user = ParticipantsModel.fromJson(element);
-        if(user.eventId == event.id){
+        if (user.eventId == event.id) {
           users.add(user);
         }
       });

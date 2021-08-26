@@ -8,40 +8,35 @@ import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/comment_model.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
-import 'package:unites_flutter/domain/models/event_with_members.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
 
-
 @injectable
 class EventRepositoryImpl implements EventRepository {
-  final db = Firestore.instance;
+  final db = FirebaseFirestore.instance;
   var userRepository = getIt<UserRepositoryImpl>();
 
   @override
   Future<List<EventModel>> initEvents() async {
     var events = <EventModel>[];
-    var docs = await db.collection('events').getDocuments();
-    docs.documents.forEach((element) {
-      element.reference
-          .collection('participants')
-          .getDocuments()
-          .then((value) => {
-                value.documents.forEach((element) {
-                  DatabaseProvider.db.insertData('participants', element.data);
-                })
-              });
-      element.reference.collection('comments').getDocuments().then((value) => {
-            value.documents.forEach((element) {
-              DatabaseProvider.db.insertData(
-                  'comments', CommentModel.fromJson(element.data).toMap());
+    var docs = await db.collection('events').get();
+    docs.docs.forEach((element) {
+      element.reference.collection('participants').get().then((value) => {
+            value.docs.forEach((element) {
+              DatabaseProvider.db.insertData('participants', element.data());
             })
           });
-      events.add(EventModel.fromJson(element.data));
+      element.reference.collection('comments').get().then((value) => {
+            value.docs.forEach((element) {
+              DatabaseProvider.db.insertData(
+                  'comments', CommentModel.fromJson(element.data()).toMap());
+            })
+          });
+      events.add(EventModel.fromJson(element.data()));
       DatabaseProvider.db
-          .insertData('events', EventModel.fromJson(element.data).toMap());
+          .insertData('events', EventModel.fromJson(element.data()).toMap());
     });
     return events;
   }
@@ -54,7 +49,7 @@ class EventRepositoryImpl implements EventRepository {
     event.owner = userId;
     await db.collection('events').add(event.toJson()).then((value) => {
           participant = ParticipantsModel(),
-          participant.eventId = value.documentID,
+          participant.eventId = value.id,
           participant.userId = currentUser.userId,
           participant.avatar = currentUser.avatar,
           participant.firstName = currentUser.firstName,
@@ -62,21 +57,21 @@ class EventRepositoryImpl implements EventRepository {
           participant.role = 'owner',
           db
               .collection('events')
-              .document(value.documentID)
+              .doc(value.id)
               .collection('participants')
               .add(participant.toJson())
               .then((value) => {
-                    participant.docId = value.documentID,
+                    participant.docId = value.id,
                     DatabaseProvider.db
                         .insertData('participants', participant.toJson()),
                     db
                         .collection('events')
-                        .document(participant.eventId)
+                        .doc(participant.eventId)
                         .collection('participants')
-                        .document(value.documentID)
-                        .updateData(participant.toJson())
+                        .doc(value.id)
+                        .update(participant.toJson())
                   }),
-          event.id = value.documentID,
+          event.id = value.id,
           DatabaseProvider.db.insertData('events', event.toMap()),
           updateEvent(event)
         });
@@ -93,12 +88,12 @@ class EventRepositoryImpl implements EventRepository {
     newComment.text = text;
     await db
         .collection('events')
-        .document(eventId)
+        .doc(eventId)
         .collection('comments')
         .add(newComment.toJson())
         .then((value) => {
-              newComment.commentId = value.documentID,
-              value.updateData(newComment.toJson()),
+              newComment.commentId = value.id,
+              value.update(newComment.toJson()),
               DatabaseProvider.db.insertData('comments', newComment.toMap())
             });
   }
@@ -116,20 +111,20 @@ class EventRepositoryImpl implements EventRepository {
         role: 'member');
     await db
         .collection('events')
-        .document(eventId)
+        .doc(eventId)
         .collection('participants')
         .add(participant.toJson())
         .then((value) => {
-              print('update participant ${value.documentID}'),
-              participant.docId = value.documentID,
+              print('update participant ${value.id}'),
+              participant.docId = value.id,
               DatabaseProvider.db
                   .insertData('participants', participant.toJson()),
               db
                   .collection('events')
-                  .document(eventId)
+                  .doc(eventId)
                   .collection('participants')
-                  .document(value.documentID)
-                  .updateData(participant.toJson())
+                  .doc(value.id)
+                  .update(participant.toJson())
             });
   }
 
@@ -137,18 +132,18 @@ class EventRepositoryImpl implements EventRepository {
   void leftEvent(String eventId) async {
     var userId = await userRepository.getCurrentUserId();
     var participant = await DatabaseProvider.db.getParticipant(eventId, userId);
-    await DatabaseProvider.db.deleteParticipant(eventId, userId);
+    DatabaseProvider.db.deleteParticipant(eventId, userId);
     await db
         .collection('events')
-        .document(eventId)
+        .doc(eventId)
         .collection('participants')
-        .document(participant.docId)
+        .doc(participant.docId)
         .delete();
   }
 
   @override
   void updateEvent(EventModel event) async {
-    await db.collection('events').document(event.id).updateData(event.toJson());
+    await db.collection('events').doc(event.id).update(event.toJson());
   }
 
   @override
@@ -171,7 +166,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<List<EventWithParticipants>> getMyEvents() async {
     var currentUserId;
     var events = <EventWithParticipants>[];
-    if(userRepository.currentUser != null){
+    if (userRepository.currentUser != null) {
       currentUserId = userRepository.currentUser.userId;
       events = await DatabaseProvider.db.getMyEvents(currentUserId);
     }
@@ -198,11 +193,11 @@ class EventRepositoryImpl implements EventRepository {
     var participants = <ParticipantsModel>[];
     await db
         .collection('events')
-        .document(eventId)
+        .doc(eventId)
         .collection('participants')
-        .getDocuments()
-        .then((value) => value.documents.forEach((element) {
-              participants.add(ParticipantsModel.fromJson(element.data));
+        .get()
+        .then((value) => value.docs.forEach((element) {
+              participants.add(ParticipantsModel.fromJson(element.data()));
             }));
     return participants;
   }

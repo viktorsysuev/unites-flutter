@@ -8,23 +8,23 @@ import 'package:unites_flutter/domain/repository/user_repository.dart';
 @singleton
 @injectable
 class UserRepositoryImpl implements UserRepository {
-  final db = Firestore.instance;
+  final db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
-  UserModel currentUser;
+  late UserModel currentUser;
 
   @override
   Future<bool> isUserExist() async {
-    final user = await auth.currentUser();
-    final doc = await db.collection('users').document(user.uid).get();
+    final user = await auth.currentUser;
+    final doc = await db.collection('users').doc(user!.uid).get();
     return doc.exists;
   }
 
   @override
   void createNewUser(UserModel user) async {
-    var currentUser = await auth.currentUser();
-    user.userId = currentUser.uid;
-    user.phone = currentUser.phoneNumber;
-    await db.collection('users').document(user.userId).setData(user.toJson());
+    var currentUser = await auth.currentUser;
+    user.userId = currentUser!.uid;
+    user.phone = currentUser.phoneNumber!;
+    await db.collection('users').doc(user.userId).set(user.toJson());
   }
 
   @override
@@ -32,10 +32,7 @@ class UserRepositoryImpl implements UserRepository {
     var userId = await getCurrentUserId();
     user.userId = userId;
     await DatabaseProvider.db.insertData('users', user.toJson());
-    await db
-        .collection('users')
-        .document(userId)
-        .updateData(user.toJson());
+    await db.collection('users').doc(userId).update(user.toJson());
   }
 
   @override
@@ -45,14 +42,14 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<FirebaseUser> getCurrentFirebaseUser() async {
-    return await auth.currentUser();
+  Future<User> getCurrentFirebaseUser() async {
+    return auth.currentUser!;
   }
 
   @override
   Future<String> getCurrentUserId() async {
-    var user = await auth.currentUser();
-    currentUser = await getUser(user.uid);
+    var user = await auth.currentUser;
+    currentUser = await getUser(user!.uid);
     return user.uid;
   }
 
