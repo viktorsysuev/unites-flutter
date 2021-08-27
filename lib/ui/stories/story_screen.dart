@@ -1,9 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
-import 'package:path/path.dart' as Path;
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/story_bloc.dart';
 import 'package:unites_flutter/domain/models/story_model.dart';
@@ -26,10 +22,10 @@ class StoryScreen extends StatefulWidget {
 class _StoryScreenState extends State<StoryScreen>
     with SingleTickerProviderStateMixin {
   var storyBloc = StoryBloc();
-  PageController? pageController;
-  PageController? globalPageController;
+  late PageController pageController;
+  late PageController globalPageController;
   VideoPlayerController? videoPlayerController;
-  AnimationController? animController;
+  late AnimationController animController;
 
   var stories = <StoryModel>[];
   var allStories = <StoryModel>[];
@@ -56,10 +52,10 @@ class _StoryScreenState extends State<StoryScreen>
     storyBloc.getStories.listen((event) {
       loadStory(story: event[0], animateToPage: false);
     });
-    animController?.addStatusListener((status) {
+    animController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        animController?.stop();
-        animController?.reset();
+        animController.stop();
+        animController.reset();
         setState(() {
           if (currentIndex + 1 < stories.length) {
             currentIndex += 1;
@@ -68,26 +64,24 @@ class _StoryScreenState extends State<StoryScreen>
             Navigator.of(context).pop();
           }
         });
-        if (videoPlayerController != null) {
-          videoPlayerController?.play();
-        }
+        videoPlayerController?.play();
       }
 
-      globalPageController?.addListener(() {
-        if (globalPageController?.page == currentGlobalIndex.toDouble()) {
-          animController?.forward();
+      globalPageController.addListener(() {
+        if (globalPageController.page == currentGlobalIndex.toDouble()) {
+          animController.forward();
           videoPlayerController?.play();
         } else {
-          animController?.stop();
+          animController.stop();
           videoPlayerController?.pause();
         }
         setState(() {
-          currentPageValue = globalPageController!.page!;
+          currentPageValue = globalPageController.page ?? 0;
         });
-        if (curPage != globalPageController?.page?.floor()) {
-          curPage = globalPageController!.page!.floor();
+        if (curPage != globalPageController.page?.floor()) {
+          curPage = globalPageController.page!.floor();
           setState(() {
-            currentGlobalIndex = globalPageController!.page!.floor();
+            currentGlobalIndex = globalPageController.page!.floor();
             currentIndex = 0;
             stories = allStories
                 .where((element) =>
@@ -105,9 +99,9 @@ class _StoryScreenState extends State<StoryScreen>
 
   @override
   void dispose() {
-    animController?.removeListener(() {});
-    pageController?.dispose();
-    animController?.dispose();
+    animController.removeListener(() {});
+    pageController.dispose();
+    animController.dispose();
     videoPlayerController?.dispose();
     super.dispose();
   }
@@ -192,7 +186,7 @@ class _StoryScreenState extends State<StoryScreen>
                 .toList();
             print(
                 'currentGlobalIndex $currentGlobalIndex currentIndex $currentIndex');
-            globalPageController?.animateToPage(currentGlobalIndex,
+            globalPageController.animateToPage(currentGlobalIndex,
                 duration: Duration(seconds: 1), curve: Curves.ease);
             loadStory(story: stories[currentIndex]);
           } else {
@@ -201,43 +195,46 @@ class _StoryScreenState extends State<StoryScreen>
         }
       });
     } else {
-      if (videoPlayerController!.value.isPlaying) {
+      if (videoPlayerController != null && videoPlayerController!.value.isPlaying) {
         videoPlayerController?.pause();
-        animController?.stop();
+        animController.stop();
       } else {
+        animController.duration = animController.duration ?? Duration(seconds: 5);
         videoPlayerController?.play();
-        animController?.forward();
+        animController.forward();
       }
     }
   }
 
   void loadStory({StoryModel? story, bool animateToPage = true}) {
-    animController?.stop();
-    animController?.reset();
+    animController.stop();
+    animController.reset();
     if (videoPlayerController != null) {
       videoPlayerController?.pause();
     }
     switch (story?.mediaType) {
       case MediaType.IMAGE:
-        animController?.duration = Duration(seconds: 5);
-        animController?.forward();
+        animController.duration = Duration(seconds: 5);
+        animController.forward();
         break;
       case MediaType.VIDEO:
         videoPlayerController?.dispose();
-        videoPlayerController = null;
         videoPlayerController = VideoPlayerController.network(story!.url)
           ..initialize().then((_) {
             setState(() {});
-            if (videoPlayerController!.value.isInitialized) {
-              animController?.duration = videoPlayerController?.value.duration;
+            if (videoPlayerController != null && videoPlayerController!.value.isInitialized) {
+              animController.duration = videoPlayerController?.value.duration ?? Duration(seconds: 5);
               videoPlayerController?.play();
-              animController?.forward();
+              animController.forward();
             }
           });
         break;
+      case null:
+        print("Story is null");
+        break;
     }
     if (animateToPage) {
-      pageController?.animateToPage(
+      pageController.animateToPage(
         currentIndex,
         duration: const Duration(milliseconds: 1),
         curve: Curves.easeInOut,
@@ -276,6 +273,10 @@ class _StoryScreenState extends State<StoryScreen>
                       ),
                     );
                   }
+                  break;
+                case null:
+                  print('empty');
+                  break;
               }
               return const SizedBox.shrink();
             }),
@@ -291,7 +292,7 @@ class _StoryScreenState extends State<StoryScreen>
                   return MapEntry(
                     i,
                     AnimatedBar(
-                      animController: animController!,
+                      animController: animController,
                       position: i,
                       currentIndex: currentIndex,
                     ),
@@ -397,7 +398,7 @@ class UserInfo extends StatelessWidget {
               radius: 20.0,
               backgroundColor: Colors.grey[300],
               backgroundImage: CachedNetworkImageProvider(
-                user.avatar!,
+                user.avatar ?? '',
               ),
             ),
             const SizedBox(width: 10.0),
