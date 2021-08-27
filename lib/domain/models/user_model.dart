@@ -4,10 +4,10 @@ class UserModel {
   String lastName;
   String interests;
   String useful;
-  String phone;
-  String company;
-  String token;
-  String aboutMe;
+  String? phone;
+  String? company;
+  String? token;
+  String? aboutMe;
   String? avatar;
 
   UserModel(
@@ -18,7 +18,7 @@ class UserModel {
       this.useful = '',
       this.phone = '',
       this.company = '',
-      this.token = '',
+      this.token,
       this.aboutMe = '',
       this.avatar});
 
@@ -36,17 +36,16 @@ class UserModel {
 
 UserModel _UserModelFromJson(Map<dynamic, dynamic> json) {
   return UserModel(
-    userId: json['userId'] as String,
-    firstName: json['firstName'] as String,
-    lastName: json['lastName'] as String,
-    interests: json['interests'] as String,
-    useful: json['useful'] as String,
-    phone: json['phone'] as String,
-    company: json['company'] as String,
-    token: json['token'] as String,
-    aboutMe: json['aboutMe'] as String,
-    avatar: json['avatar'] as String,
-  );
+      userId: json['userId'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      interests: json['interests'],
+      useful: json['useful'],
+      phone: json['phone'],
+      company: json['company'],
+      token: json['token'],
+      aboutMe: json['aboutMe'],
+      avatar: json['avatar']);
 }
 
 Map<String, dynamic> _UserModelToJson(UserModel instance) => <String, dynamic>{

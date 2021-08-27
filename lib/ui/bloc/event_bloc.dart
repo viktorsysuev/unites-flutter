@@ -13,7 +13,6 @@ import 'package:unites_flutter/domain/models/user_model.dart';
 
 @injectable
 class EventsBloc {
-
   EventsBloc() {
     events;
     eventWithParticipants;
@@ -28,7 +27,6 @@ class EventsBloc {
   final _eventsController = StreamController<List<EventModel>>.broadcast();
 
   final _participantsController = StreamController<List<UserModel>>.broadcast();
-
 
   final _commentsController =
       StreamController<List<CommentWithUser>>.broadcast();
@@ -76,12 +74,16 @@ class EventsBloc {
     firestoreDB.collection('events').snapshots().listen((event) {
       event.docChanges.forEach((element) async {
         if (element.type == DocumentChangeType.added) {
-          var event = EventModel.fromJson(element.doc.data() as Map<String, dynamic>);
+          if (element.doc.data() == null) return;
+          var event =
+              EventModel.fromJson(element.doc.data()!);
           await DatabaseProvider.db.insertData('events', event.toMap());
           inAddEvent.add(event);
           getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
-          var event = EventModel.fromJson(element.doc.data() as Map<String, dynamic>);
+          if (element.doc.data() == null) return;
+          var event =
+              EventModel.fromJson(element.doc.data()!);
           DatabaseProvider.db.deleteEvent(event.id);
           getEvents();
           getMyEventsWithParticipants();
@@ -103,14 +105,17 @@ class EventsBloc {
         .listen((participant) {
       participant.docChanges.forEach((element) async {
         if (element.type == DocumentChangeType.modified) {
-          var participant = ParticipantsModel.fromJson(element.doc.data() as Map<String, dynamic>); //TODO("Test this if correct transformation")
+          if (element.doc.data() == null) return;
+          var participant = ParticipantsModel.fromJson(element.doc
+              .data()!);
           await DatabaseProvider.db
               .insertData('participants', participant.toJson());
           getEventWithParticipants(participant.eventId);
           getMyEventsWithParticipants();
         } else if (element.type == DocumentChangeType.removed) {
           print('listener removed');
-          var participant = ParticipantsModel.fromJson(element.doc.data() as Map<String, dynamic>);
+          if (element.doc.data() == null) return;
+          var participant = ParticipantsModel.fromJson(element.doc.data()!);
           DatabaseProvider.db
               .deleteParticipant(participant.eventId, participant.userId);
           getEventWithParticipants(participant.eventId);

@@ -33,7 +33,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       ),
       body: WillPopScope(
         onWillPop: () async {
-          return false;
+          return true;
         },
         child: Stack(
           children: <Widget>[

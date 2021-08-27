@@ -4,7 +4,7 @@ class StoryModel {
   String url;
   String storyId;
   MediaType? mediaType;
-  int duration;
+  int? duration;
   String userId;
 
   StoryModel(
@@ -34,12 +34,12 @@ class StoryModel {
 
 StoryModel _StoryModelFromJson(Map<dynamic, dynamic> json) {
   return StoryModel(
-    url: json['url'] as String,
-    storyId: json['storyId'] as String,
+    url: json['url'],
+    storyId: json['storyId'],
     duration: json['duration'],
     mediaType: MediaType.values
         .firstWhere((e) => e.toString() == 'MediaType.' + json['mediaType']),
-    userId: json['userId'] as String,
+    userId: json['userId'],
   );
 }
 

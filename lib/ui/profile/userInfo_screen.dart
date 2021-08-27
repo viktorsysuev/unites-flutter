@@ -17,7 +17,6 @@ class UserInfoScreen extends StatefulWidget {
 }
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
-  var userRepository = getIt<UserRepositoryImpl>();
   final userBloc = getIt<UsersBloc>();
 
   @override

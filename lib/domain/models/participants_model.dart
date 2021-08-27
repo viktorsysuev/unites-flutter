@@ -27,13 +27,13 @@ class ParticipantsModel {
 
 ParticipantsModel _ParticipantsModelFromJson(Map<dynamic, dynamic> json) {
   return ParticipantsModel(
-    docId: json['docId'] as String,
-    eventId: json['eventId'] as String,
-    userId: json['userId'] as String,
-    avatar: json['avatar'] as String,
-    firstName: json['firstName'] as String,
-    lastName: json['lastName'] as String,
-    role: json['role'] as String,
+    docId: json['docId'],
+    eventId: json['eventId'],
+    userId: json['userId'],
+    avatar: json['avatar'],
+    firstName: json['firstName'],
+    lastName: json['lastName'],
+    role: json['role'],
   );
 }
 
