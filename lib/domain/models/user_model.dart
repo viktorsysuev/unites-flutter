@@ -38,7 +38,7 @@ UserModel _UserModelFromJson(Map<dynamic, dynamic> json) {
   return UserModel(
       userId: json['userId'],
       firstName: json['firstName'],
-      lastName: json['lastName'],
+      lastName: json['lastName'] ?? '',
       interests: json['interests'],
       useful: json['useful'],
       phone: json['phone'],

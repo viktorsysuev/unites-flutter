@@ -153,13 +153,13 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 maintainSize: true,
                 maintainAnimation: true,
                 maintainState: true,
-                visible: _image == null && snapshot.data!.avatar == null,
+                visible: _image == null && snapshot.data?.avatar == null,
                 child: Text(
-                    '${snapshot.data?.firstName[0]}${snapshot.data?.lastName[0]}',
+                    '${snapshot.data?.firstName[0] ?? ''}${snapshot.data?.lastName[0] ?? ''}',
                     style: TextStyle(fontSize: 44, color: Colors.white),
                     textAlign: TextAlign.center),
               ),
-              if (snapshot.data!.avatar != null)
+              if (snapshot.data?.avatar != null)
                 ClipOval(
                     child: SizedBox(
                         width: 300,
