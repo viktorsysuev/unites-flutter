@@ -12,7 +12,9 @@ import 'package:path/path.dart' as path;
 import 'package:unites_flutter/ui/bloc/story_bloc.dart';
 import 'package:unites_flutter/domain/models/story_model.dart';
 import 'package:unites_flutter/data/repository/user_repository_impl.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
+import '../home.dart';
 import '../main.dart';
 
 class CreateStoryScreen extends StatefulWidget {
@@ -222,53 +224,52 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   // Future<FileSystemEntity> getLastImage() async {
-    // final extDir = await getApplicationDocumentsDirectory();
-    //
-    // final dirPath = '${extDir.path}/media';
-    // final myDir = Directory(dirPath);
-    //
-    // List<FileSystemEntity> _images;
-    // _images = myDir.listSync(recursive: true, followLinks: false);
-    // _images.sort((a, b) {
-    //   return b.path.compareTo(a.path);
-    // });
-    // var lastFile = _images[0];
-    // var extension = path.extension(lastFile.path);
-    // if (extension == '.jpeg') {
-    //   return lastFile;
-    // } else {
-    //   var thumb = await Thumbnails.getThumbnail(videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
-    //   return File(thumb);
-    // }
+  //   final extDir = await getApplicationDocumentsDirectory();
+  //   final dirPath = '${extDir.path}/media';
+  //   final myDir = Directory(dirPath);
+  //   List<FileSystemEntity> _images;
+  //   _images = myDir.listSync(recursive: true, followLinks: false);
+  //   _images.sort((a, b) {
+  //     return b.path.compareTo(a.path);
+  //   });
+  //   var lastFile = _images[0];
+  //   var extension = path.extension(lastFile.path);
+  //   if (extension == '.jpeg') {
+  //     return lastFile;
+  //   } else {
+  //     var thumb = await Thumbnails.getThumbnail(videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
+  //     return File(thumb);
+  //   }
   // }
 
   Future<void> pickFromGallery() async {
-    // var videoPath;
-    // var file = await FilePicker.getFile(
-    //     type: FileType.custom,
-    //     allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
-    // if (file != null) {
-    //   // videoPath = await Thumbnails.getThumbnail(
-    //   //     videoFile: file.path, imageType: ThumbFormat.PNG, quality: 30);
-    // }
-    // setState(() {
-    //   _file = file;
-    //   if (videoPath != null) {
-    //     if (getMediaType(file.path) == MediaType.VIDEO) {
-    //       videoThumb = File(videoPath);
-    //     }
-    //   }
-    // });
+    var videoPath;
+    var file = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'png', 'mp4', 'wmv', 'webm', 'mov', 'gif']);
+    if (file != null && file.count >= 1) {
+      if (getMediaType(file.paths[0]!) == MediaType.VIDEO) {
+        videoPath = await VideoThumbnail.thumbnailFile(
+            video: file.paths[0]!, quality: 30);
+      }
+
+      setState(() {
+        final path = file.paths[0]!;
+        _file = File(path);
+        if (videoPath != null) {
+          if (getMediaType(path) == MediaType.VIDEO) {
+            videoThumb = File(videoPath);
+          }
+        }
+      });
+    }
   }
 
   void captureImage() async {
-    if (cameraController!.value.isInitialized) {
+    if (cameraController != null && cameraController!.value.isInitialized) {
       await SystemSound.play(SystemSoundType.click);
-      final extDir = await getApplicationDocumentsDirectory();
-      final dirPath = '${extDir.path}/media';
-      await Directory(dirPath).create(recursive: true);
-      final filePath = '$dirPath/${DateTime.now().toIso8601String()}.jpeg';
-      // await cameraController?.takePicture(filePath);
+      final xFile = await cameraController!.takePicture();
+      final filePath = xFile.path;
       setState(() {
         _file = File(filePath);
       });
@@ -276,21 +277,20 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   void createStory() async {
-    // var metadata = StorageMetadata(contentType: lookupMimeType(_file!.path));
-    // var firebaseStorage =
-    //     FirebaseStorage.instance.ref().child(path.basename(_file!.path));
-    // var task = await firebaseStorage.putFile(_file!, metadata);
-    // // await task.onComplete;
-    // var url = await firebaseStorage.getDownloadURL();
-    // var story = StoryModel();
-    // story.userId = userRepository.currentUser.userId;
-    // story.url = url;
-    // story.mediaType = getMediaType(_file!.path);
-    // storyBloc.createStory(story);
-    // Navigator.of(context).pop();
-//    await Navigator.of(context).pushAndRemoveUntil(
-//        MaterialPageRoute(builder: (context) => Home()),
-//        (Route<dynamic> route) => false);
+    var metadata = SettableMetadata(contentType: lookupMimeType(_file!.path));
+    var firebaseStorage =
+        FirebaseStorage.instance.ref().child(path.basename(_file!.path));
+    await firebaseStorage.putFile(_file!, metadata);
+    var url = await firebaseStorage.getDownloadURL();
+    var story = StoryModel();
+    story.userId = userRepository.currentUser.userId;
+    story.url = url;
+    story.mediaType = getMediaType(_file!.path);
+    storyBloc.createStory(story);
+    Navigator.of(context).pop();
+    await Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => Home()),
+        (Route<dynamic> route) => false);
   }
 
   MediaType getMediaType(String path) {
