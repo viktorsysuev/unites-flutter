@@ -61,7 +61,9 @@ class _EditProfileScreen extends State<EditProfileScreen> {
     var image = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 85);
     setState(() {
-      // _image = image;
+      if (image != null) {
+        _image = File(image.path);
+      }
     });
   }
 
