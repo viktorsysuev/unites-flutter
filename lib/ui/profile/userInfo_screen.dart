@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:unites_flutter/ui/bloc/chat_bloc_new.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/user_bloc.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
@@ -129,7 +131,14 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            PrivateChatScreen(userId: snapshot.data!.userId)));
+                    BlocProvider(
+                      create: (_) => ChatBlocNew(),
+                      child: BlocBuilder<ChatBlocNew, ChatBlocState>(
+                        builder: (_, theme) {
+                          return PrivateChatScreen(userId: snapshot.data!.userId);
+                        },
+                      ),
+                    )));
               },
             ),
           ),

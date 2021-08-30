@@ -1,32 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:unites_flutter/ui/bloc/chat_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:unites_flutter/domain/models/message_model.dart';
+import 'package:unites_flutter/ui/bloc/chat_bloc_new.dart';
 
-class PrivateChatScreen extends StatefulWidget {
-  String userId;
-
+class PrivateChatScreen extends StatelessWidget {
   PrivateChatScreen({required this.userId});
 
-  @override
-  _PrivateChatScreenState createState() => _PrivateChatScreenState();
-}
+  String userId;
 
-class _PrivateChatScreenState extends State<PrivateChatScreen> {
   var textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
-  var listMessage = <MessageModel>[];
-
-  var chatsBloc = ChatsBloc();
-
-  @override
-  void initState() {
-    chatsBloc.addMessagesListener(widget.userId);
-    chatsBloc.fetchAllMessages(widget.userId);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    context.read<ChatBlocNew>().add(FetchAllMessagesEvent(userId: userId));
     return Scaffold(
       appBar: AppBar(
         title: Text('Приватный чат'),
@@ -40,28 +27,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
             Column(
               children: <Widget>[
                 Flexible(
-                  child: StreamBuilder<List<MessageModel>>(
-                    stream: chatsBloc.getMessages,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                            child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.black)));
-                      } else {
-                        listMessage = snapshot.data!;
-//                        listMessage.sort((MessageModel a, MessageModel b) => b.createdAt.compareTo(a.createdAt));
-                        return ListView.builder(
-                          padding: EdgeInsets.all(10.0),
-                          itemBuilder: (context, index) =>
-                              buildItem(index, listMessage[index]),
-                          itemCount: listMessage.length,
-                          reverse: true,
-                          controller: listScrollController,
-                        );
-                      }
-                    },
-                  ),
+                  child: _buildList(),
                 ),
                 Container(
                   width: double.infinity,
@@ -96,8 +62,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                           child: IconButton(
                             icon: Icon(Icons.send),
                             onPressed: () => {
-                              chatsBloc.sendNewMessage(
-                                  widget.userId, textEditingController.text),
+                              context.read<ChatBlocNew>().add(SendMessageEvent(
+                                  userId: userId,
+                                  text: textEditingController.text)),
                               textEditingController.clear()
                             },
                             color: Colors.blueAccent,
@@ -147,5 +114,26 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               ),
             )
           ]);
+  }
+
+  Widget _buildList() {
+    return BlocBuilder<ChatBlocNew, ChatBlocState>(
+      builder: (_, state) {
+        if (state.messages.isEmpty) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView.builder(
+            padding: EdgeInsets.all(10.0),
+            itemBuilder: (context, index) =>
+                buildItem(index, state.messages[index]),
+            itemCount: state.messages.length,
+            reverse: true,
+            controller: listScrollController,
+          );
+        }
+      },
+    );
   }
 }

@@ -53,6 +53,7 @@ dependencies:
 #  thumbnails: ^1.0.1
   video_thumbnail: ^0.4.3
   connectivity: ^3.0.6
+  flutter_bloc: ^7.2.0
   # Add the following three lines
 
 
