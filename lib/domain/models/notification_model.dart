@@ -50,8 +50,8 @@ NotificationModel _NotificationModelFromJson(Map<dynamic, dynamic> json) {
     createdAt: (json['createdAt'] as Timestamp).toDate(),
     state: NotificationState.values.firstWhere(
         (e) => e.toString() == 'NotificationState.' + json['state']),
-    initiatorId: json['initiatorId'] as String,
-    initiatorName: json['initiatorName'] as String,
+    initiatorId: json['initiatorId'] as String? ?? '',
+    initiatorName: json['initiatorName'] as String? ?? '',
     seenByMe: json['seenByMe'] as bool,
   );
 }

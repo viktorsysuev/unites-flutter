@@ -66,7 +66,7 @@ EventModel _EventModelFromJson(Map<String, dynamic> json) {
     phoneNumber: json['phoneNumber'] as String,
     email: json['email'] as String,
     address: json['address'] as String,
-    coordinates: json['coordinates'] as GeoPoint,
+    coordinates: json['coordinates'] as GeoPoint?,
     start: json['start'] == null ? null : (json['start'] as Timestamp).toDate(),
     end: json['end'] == null ? null : (json['end'] as Timestamp).toDate(),
   );
