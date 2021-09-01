@@ -1,13 +1,14 @@
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
+import 'package:unites_flutter/domain/models/image_collection.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 
 abstract class EventRepository {
   Future<List<EventModel>> initEvents();
 
-  void addNewEvent(EventModel event);
+  void addNewEvent(EventModel event, {EventImagesModel? images});
 
   void addNewComment(String text, String eventId);
 
@@ -34,4 +35,6 @@ abstract class EventRepository {
   Future<List<ParticipantsModel>> getEventParticipants(String eventId);
 
   Future<bool> isParticipant(String eventId);
+
+  Future<EventImagesModel?> getImages(String id);
 }

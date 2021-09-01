@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
+import 'package:unites_flutter/domain/models/image_collection.dart';
 import 'package:unites_flutter/domain/repository/event_repository.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
@@ -42,12 +43,17 @@ class EventRepositoryImpl implements EventRepository {
   }
 
   @override
-  void addNewEvent(EventModel event) async {
+  void addNewEvent(EventModel event, {EventImagesModel? images}) async {
     var userId = await userRepository.getCurrentUserId();
     var currentUser = await userRepository.getUser(userId);
     ParticipantsModel participant;
     event.owner = userId;
     await db.collection('events').add(event.toJson()).then((value) => {
+          if (images != null)
+            {
+              images.id = value.id,
+              _addNewEventImages(value.id, images),
+            },
           participant = ParticipantsModel(),
           participant.eventId = value.id,
           participant.userId = currentUser.userId,
@@ -75,6 +81,28 @@ class EventRepositoryImpl implements EventRepository {
           DatabaseProvider.db.insertData('events', event.toMap()),
           updateEvent(event)
         });
+  }
+
+  void _addNewEventImages(String id, EventImagesModel images) {
+    db
+        .collection('events')
+        .doc(id)
+        .collection('images')
+        .add(images.toJson())
+        .then((value) => {
+          print('Success added: ${value.id}')
+    });
+  }
+
+  @override
+  Future<EventImagesModel?> getImages(String id) async{
+    var docs = await db.collection('events').doc(id).collection('images').get();
+    if(docs.size >= 1){
+      print('getImages: ${docs.docs[0].data()}');
+      return EventImagesModel.fromJson(docs.docs[0].data());
+    }
+
+    return null;
   }
 
   @override

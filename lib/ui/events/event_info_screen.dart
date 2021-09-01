@@ -1,7 +1,9 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:unites_flutter/domain/models/image_collection.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/ui/bloc/event_bloc.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
@@ -31,6 +33,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
   @override
   void didChangeDependencies() {
     eventBloc.getEventCommetns(widget.eventId);
+    eventBloc.getEventImages(widget.eventId);
     eventBloc.addParticipantsListener();
     eventBloc.isMember(widget.eventId).then((isParticipant) => {
           if (isParticipant)
@@ -215,6 +218,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
               if (snapshot.hasData) {
                 child = SingleChildScrollView(
                   child: Column(children: <Widget>[
+                    _buildImagePreview(),
                     Container(margin: EdgeInsets.only(top: 16.0, bottom: 8.0)),
                     Padding(
                         padding: EdgeInsets.only(left: 16.0, right: 16.0),
@@ -393,6 +397,37 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
             },
           ),
         ));
+  }
+
+  Widget _buildImagePreview() {
+    return StreamBuilder<EventImagesModel?>(
+        stream: eventBloc.images,
+        builder:
+            (BuildContext context, AsyncSnapshot<EventImagesModel?> snapshot) {
+          if (snapshot.hasData) {
+            final data = snapshot.data!;
+            // return _imagePage(data.imagesPath[0]);
+
+            return CarouselSlider.builder(
+              options: CarouselOptions(height: 200),
+              itemCount: data.imagesPath.length,
+              itemBuilder: (BuildContext context, int itemIndex, pageViewIndex)=>
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: _imagePage(data.imagesPath[itemIndex])
+                ),
+            );
+
+          } else {
+            return Container();
+          }
+        });
+  }
+
+  Widget _imagePage(String imagePath) {
+    print('loadImage from path: $imagePath');
+    return Image.network(imagePath, fit: BoxFit.cover, width: MediaQuery.of(context).size.width);
+
   }
 
   String getCommentTime(DateTime date) {

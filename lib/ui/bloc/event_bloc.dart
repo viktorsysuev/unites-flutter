@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/domain/interactors/event_interactor.dart';
+import 'package:unites_flutter/domain/models/image_collection.dart';
 import 'package:unites_flutter/ui/main.dart';
 import 'package:unites_flutter/data/database/database_provider.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
@@ -54,6 +55,10 @@ class EventsBloc {
   final _addEventsController = StreamController<EventModel>.broadcast();
 
   StreamSink<EventModel> get inAddEvent => _addEventsController.sink;
+
+  final _images = StreamController<EventImagesModel?>();
+
+  Stream<EventImagesModel?> get images => _images.stream;
 
   void getEvents() async {
     var events = await _eventInteractor.getAllEvents();
@@ -136,14 +141,19 @@ class EventsBloc {
     _commentsController.sink.add(comments);
   }
 
+  void getEventImages(String eventId) async{
+    var images = await _eventInteractor.getEventImages(eventId);
+    _images.sink.add(images);
+  }
+
   sendComment(String text, String eventId) async {
     _eventInteractor.addNewComment(text, eventId);
     getEventCommetns(eventId);
   }
 
-  createEvent(EventModel eventModel) {
+  createEvent(EventModel eventModel, {EventImagesModel? images}) {
     inAddEvent.add(eventModel);
-    _eventInteractor.addNewEvent(eventModel);
+    _eventInteractor.addNewEvent(eventModel, images: images);
   }
 
   joinEvent(String eventId) async {

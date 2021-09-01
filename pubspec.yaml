@@ -53,6 +53,7 @@ dependencies:
 #  thumbnails: ^1.0.1
   video_thumbnail: ^0.4.3
   connectivity: ^3.0.6
+  carousel_slider: ^4.0.0
   # Add the following three lines
 
 

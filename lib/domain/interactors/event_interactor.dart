@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:unites_flutter/domain/models/comment_with_user.dart';
 import 'package:unites_flutter/domain/models/event_model.dart';
 import 'package:unites_flutter/domain/models/event_with_participants.dart';
+import 'package:unites_flutter/domain/models/image_collection.dart';
 import 'package:unites_flutter/domain/models/participants_model.dart';
 import 'package:unites_flutter/domain/models/user_model.dart';
 import 'package:unites_flutter/domain/repository/event_repository.dart';
@@ -16,8 +17,8 @@ class EventInteractor {
     return await eventRepository.initEvents();
   }
 
-  void addNewEvent(EventModel event) {
-    eventRepository.addNewEvent(event);
+  void addNewEvent(EventModel event, {EventImagesModel? images}) {
+    eventRepository.addNewEvent(event, images: images);
   }
 
   void addNewComment(String text, String eventId) {
@@ -70,5 +71,9 @@ class EventInteractor {
 
   Future<bool> isParticipant(String eventId) {
     return eventRepository.isParticipant(eventId);
+  }
+
+  Future<EventImagesModel?> getEventImages(String id){
+    return eventRepository.getImages(id);
   }
 }
