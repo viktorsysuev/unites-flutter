@@ -6,7 +6,7 @@ abstract class UserRepository {
 
   void createNewUser(UserModel user);
 
-  UserModel getCurrentUser();
+  UserModel? getCurrentUser();
 
   void updateUser(UserModel user);
 

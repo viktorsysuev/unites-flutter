@@ -277,13 +277,17 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   void createStory() async {
+    if (userRepository.currentUser == null) {
+      throw Exception('User not init');
+    }
+
     var metadata = SettableMetadata(contentType: lookupMimeType(_file!.path));
     var firebaseStorage =
         FirebaseStorage.instance.ref().child(path.basename(_file!.path));
     await firebaseStorage.putFile(_file!, metadata);
     var url = await firebaseStorage.getDownloadURL();
     var story = StoryModel();
-    story.userId = userRepository.currentUser.userId;
+    story.userId = userRepository.currentUser!.userId;
     story.url = url;
     story.mediaType = getMediaType(_file!.path);
     storyBloc.createStory(story);

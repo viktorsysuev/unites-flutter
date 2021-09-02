@@ -10,18 +10,18 @@ import 'package:unites_flutter/domain/repository/user_repository.dart';
 class UserRepositoryImpl implements UserRepository {
   final db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
-  late UserModel currentUser;
+  UserModel? currentUser;
 
   @override
   Future<bool> isUserExist() async {
-    final user = await auth.currentUser;
-    final doc = await db.collection('users').doc(user!.uid).get();
+    final user = auth.currentUser;
+    final doc = await db.collection('users').doc(user?.uid).get();
     return doc.exists;
   }
 
   @override
   void createNewUser(UserModel user) async {
-    var currentUser = await auth.currentUser;
+    var currentUser = auth.currentUser;
     user.userId = currentUser!.uid;
     user.phone = currentUser.phoneNumber!;
     await db.collection('users').doc(user.userId).set(user.toJson());
@@ -48,7 +48,7 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<String> getCurrentUserId() async {
-    var user = await auth.currentUser;
+    var user = auth.currentUser;
     currentUser = await getUser(user!.uid);
     return user.uid;
   }
@@ -59,7 +59,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  UserModel getCurrentUser() {
+  UserModel? getCurrentUser() {
     return currentUser;
   }
 }

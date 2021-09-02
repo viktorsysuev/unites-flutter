@@ -422,7 +422,7 @@ class UserInfo extends StatelessWidget {
             ),
           ],
         ),
-        userRepository.currentUser.userId == user.userId
+        userRepository.currentUser?.userId == user.userId
             ? GestureDetector(
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(

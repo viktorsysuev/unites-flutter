@@ -58,6 +58,11 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
                       var user = index == 0
                           ? userRepository.currentUser
                           : users[index - 1];
+
+                      if(user == null) {
+                        throw Exception('User not init');
+                      }
+
                       usersToSend.add(user);
                       return index == 0 && !snapshot.data!.contains(user)
                           ? Padding(

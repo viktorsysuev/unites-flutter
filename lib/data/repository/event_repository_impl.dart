@@ -167,7 +167,7 @@ class EventRepositoryImpl implements EventRepository {
     var currentUserId;
     var events = <EventWithParticipants>[];
     if (userRepository.currentUser != null) {
-      currentUserId = userRepository.currentUser.userId;
+      currentUserId = userRepository.currentUser?.userId;
       events = await DatabaseProvider.db.getMyEvents(currentUserId);
     }
     return events;

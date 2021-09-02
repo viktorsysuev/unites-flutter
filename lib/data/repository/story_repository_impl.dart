@@ -29,7 +29,7 @@ class StoryRepositoryImpl implements StoryRepository {
 
   @override
   void createStory(StoryModel story) async {
-    var userId = userRepository.currentUser.userId;
+    var userId = userRepository.currentUser?.userId;
     await db
         .collection('users')
         .doc(userId)
