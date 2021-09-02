@@ -409,7 +409,7 @@ class _EventInfoScreenState extends State<EventInfoScreen> {
             // return _imagePage(data.imagesPath[0]);
 
             return CarouselSlider.builder(
-              options: CarouselOptions(height: 200),
+              options: CarouselOptions(height: 200, viewportFraction: 1),
               itemCount: data.imagesPath.length,
               itemBuilder: (BuildContext context, int itemIndex, pageViewIndex)=>
                 Container(
